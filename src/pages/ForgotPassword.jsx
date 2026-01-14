@@ -10,7 +10,6 @@ export default function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({ email });
     setSubmitted(true);
   };
 
