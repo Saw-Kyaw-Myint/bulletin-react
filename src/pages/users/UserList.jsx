@@ -6,7 +6,7 @@ import DataTable from "../../components/DataTable";
 import ConfirmModal from "../../components/ConfirmModel";
 import Loading from "../../components/Loading";
 import SearchActionButtons from "../../components/SearchActionButton";
-import FormSelect from "../../components/Form/FormSelecte";
+import FormSelect from "../../components/Form/FormSelect";
 import FormInput from "../../components/Form/FormInput";
 import { useNavigate } from "react-router-dom";
 
@@ -18,7 +18,7 @@ const UsersList = () => {
     "Role",
     "Status",
     "Created Date",
-    "Setting",
+    "Settings",
   ];
 
   const roleOptions = [
@@ -367,7 +367,10 @@ const UsersList = () => {
                         {user.name}
                       </td>
 
-                      <td className="px-6 py-4 text-purple-200">
+                      <td
+                        className="px-6 py-4 text-purple-200 hover:underline cursor-pointer"
+                        onClick={() => navigate(`/user/${user.id}`)}
+                      >
                         {user.email}
                       </td>
 
@@ -399,7 +402,7 @@ const UsersList = () => {
                             e.stopPropagation();
                             toggleSettings(user.id);
                           }}
-                          className="p-2 text-purple-300 hover:text-white"
+                          className="p-2 text-purple-300 cursor-pointer hover:text-white"
                         >
                           <Settings
                             size={16}

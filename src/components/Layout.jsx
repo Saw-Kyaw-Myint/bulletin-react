@@ -7,12 +7,10 @@ import {
   LogOut,
   User,
   Calendar,
-  Settings,
   Menu,
-  X,
   ChevronUp,
   ChevronDown,
-  User2,
+  ChevronsLeftIcon,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Logo from "./Logo";
@@ -102,9 +100,13 @@ export default function Layout({ children, activeRoute }) {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+              className="p-1.5 text-white cursor-pointer rounded-full bg-white/10 transition-colors -mb-5"
             >
-              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              {isSidebarOpen ? (
+                <ChevronsLeftIcon size={22} />
+              ) : (
+                <Menu size={20} />
+              )}
             </button>
             <Logo className="h-16 -mt-3" />
           </div>
