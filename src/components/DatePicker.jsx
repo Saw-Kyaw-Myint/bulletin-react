@@ -53,7 +53,7 @@ const DatePicker = ({ value, onChange, placeholder }) => {
       />
 
       {isOpen && (
-        <div className="absolute !z-50 mt-2 w-full bg-gray-800 border border-white/20 rounded-lg shadow-xl p-4">
+        <div className="absolute !z-50 mt-2 w-64 bg-gray-800 border border-white/20 rounded-lg shadow-xl p-4">
           <div className="flex space-x-2 mb-3">
             <select
               value={year}

@@ -110,7 +110,12 @@ export default function Layout({ children, activeRoute }) {
           </div>
 
           <div className="flex items-center space-x-6">
-            <div className="text-white text-sm">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="text-white text-sm"
+            >
               <span className="opacity-70 font-bold italic">Last Login : </span>
               {useAuthStore.getState().user?.last_login_at
                 ? format(
@@ -118,17 +123,25 @@ export default function Layout({ children, activeRoute }) {
                     "dd-MM-yyyy"
                   )
                 : ""}
-            </div>
+            </motion.div>
 
-            <div className="flex items-center space-x-2">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="flex items-center space-x-2"
+            >
               <span className="text-white text-sm">
                 {Role[useAuthStore.getState().user?.role] ?? ""}
               </span>
-            </div>
+            </motion.div>
 
             <div className="relative">
               {/* User name + dropdown icon */}
-              <div
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 className="flex items-center space-x-1 cursor-pointer select-none"
                 onClick={toggleDropdown}
               >
@@ -147,7 +160,7 @@ export default function Layout({ children, activeRoute }) {
                     className="text-gray-800  font-bold px-1 py-1  rounded-full bg-white/10 backdrop-blur-xl border-white/20 "
                   />
                 )}
-              </div>
+              </motion.div>
 
               {/* Dropdown menu */}
               {isOpen && (
