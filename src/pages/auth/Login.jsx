@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import Logo from "../components/Logo";
+import Logo from "../../components/Logo";
 import { Link, Router } from "react-router-dom";
-import { useLogin } from "../hooks/useAuth";
-import ErrorMessage from "../components/ErrorMessage";
+import ErrorMessage from "../../components/ErrorMessage";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "../store/useAuthStore";
+import useAuthStore from "../../store/useAuthStore";
+import { useLogin } from "../../hooks/useAuth";
 
 export default function Login() {
   const [email, setEmail] = useState("");

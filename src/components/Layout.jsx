@@ -12,6 +12,7 @@ import {
   X,
   ChevronUp,
   ChevronDown,
+  User2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Logo from "./Logo";
@@ -20,7 +21,7 @@ import { Role } from "../constants/commons";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 
-export default function Layout({ children }) {
+export default function Layout({ children, activeRoute }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeMenu, setActiveMenu] = useState("post-list");
   const { logout, user } = useAuthStore();
@@ -57,13 +58,27 @@ export default function Layout({ children }) {
   ];
 
   const menuItems = [
-    { id: "post-list", label: "Post List", icon: FileText, count: 7 },
-    { id: "post-create", label: "Post Create", icon: FileText, count: 8 },
-    { id: "user-list", label: "User List", icon: Users, count: 9 },
-    { id: "user-create", label: "User Create", icon: UserPlus, count: 10 },
+    { id: "post-list", label: "Post List", icon: FileText, url: "/posts" },
+    {
+      id: "post-create",
+      label: "Post Create",
+      icon: FileText,
+      url: "/post/create",
+    },
+    { id: "user-list", label: "User List", icon: Users, url: "/users" },
+    {
+      id: "user-create",
+      label: "User Create",
+      icon: UserPlus,
+      url: "/user/create",
+    },
   ];
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
+
+  const goRoute = (url) => {
+    navigate(url, { replace: true });
+  };
 
   const handleLogout = () => {
     removeCookie("access_token", { path: "/" });
@@ -114,10 +129,11 @@ export default function Layout({ children }) {
             <div className="relative">
               {/* User name + dropdown icon */}
               <div
-                className="flex items-center space-x-2 cursor-pointer select-none"
+                className="flex items-center space-x-1 cursor-pointer select-none"
                 onClick={toggleDropdown}
               >
-                <span className="text-gray-900 font-bold text-lg">
+                <User className="text-gray-300 h-4 -mr-0.5" />
+                <span className="text-white font-medium text-mx italic">
                   {user?.name ?? ""}
                 </span>
                 {isOpen ? (
@@ -171,9 +187,9 @@ export default function Layout({ children }) {
               {menuItems.map((item) => (
                 <li key={item.id}>
                   <button
-                    onClick={() => setActiveMenu(item.id)}
-                    className={`flex items-center w-full px-4 py-3 text-white rounded-lg transition-all duration-200 ${
-                      activeMenu === item.id
+                    onClick={() => goRoute(item.url)}
+                    className={`flex cursor-pointer items-center w-full px-4 py-3 text-white rounded-lg transition-all duration-200 ${
+                      activeRoute === item.id
                         ? "bg-blue-500/30 border-l-4 border-blue-500"
                         : "hover:bg-white/10"
                     }`}

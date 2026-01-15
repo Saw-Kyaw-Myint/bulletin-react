@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import Logo from "../components/Logo";
+import Logo from "../../components/Logo";
 import { Link } from "react-router-dom";
 
 export default function App() {

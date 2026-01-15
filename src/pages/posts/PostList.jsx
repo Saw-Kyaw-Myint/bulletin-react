@@ -4,10 +4,6 @@ import {
   Search,
   RefreshCw,
   Edit,
-  Calendar,
-  Settings,
-  ArrowLeft,
-  User,
   Plus,
   Upload,
   Download,
@@ -15,12 +11,12 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import Layout from "../components/Layout";
-import DatePicker from "../components/DatePicker";
-import useAuthStore from "../store/useAuthStore";
+import Layout from "../../components/Layout";
+import DatePicker from "../../components/DatePicker";
+import useAuthStore from "../../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 export default function PostList({ user }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchForm, setSearchForm] = useState({
     postName: "",
     postDescription: "",
@@ -30,6 +26,7 @@ export default function PostList({ user }) {
   const [selectAll, setSelectAll] = useState(false);
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const navigate = useNavigate();
 
   // Mock post data
   const mockPosts = [
@@ -89,7 +86,8 @@ export default function PostList({ user }) {
     console.log("Search submitted:", searchForm);
   };
 
-  const handleSelectAll = () => {
+  const handleSelectAll = (event) => {
+    event.stopPropagation();
     const newSelectAll = !selectAll;
     setSelectAll(newSelectAll);
     const newSelectedRows = new Set();
@@ -138,6 +136,7 @@ export default function PostList({ user }) {
   };
 
   const handleDelete = () => {
+    console.log("v", selectedRows.size);
     if (selectedRows.size > 0) {
       setShowConfirmDelete(true);
     }
@@ -147,7 +146,7 @@ export default function PostList({ user }) {
     console.log("Deleting selected posts:", Array.from(selectedRows));
     setSelectedRows(new Set());
     setSelectAll(false);
-    setShowConfirmDelete(false);
+    setShowConfirmDelete(true);
   };
 
   const cancelDelete = () => {
@@ -155,7 +154,7 @@ export default function PostList({ user }) {
   };
 
   return (
-    <Layout>
+    <Layout activeRoute="post-list">
       {/* Main Content */}
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
@@ -236,13 +235,13 @@ export default function PostList({ user }) {
                 <button
                   type="button"
                   onClick={handleSearchReset}
-                  className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors duration-200 flex items-center justify-center w-full"
+                  className="px-4 py-2.5 cursor-pointer bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors duration-200 flex items-center justify-center w-full"
                 >
                   <RefreshCw size={16} />
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-all duration-300 w-full flex items-center justify-center"
+                  className="px-4 py-2.5 cursor-pointer bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-all duration-300 w-full flex items-center justify-center"
                 >
                   <Search size={16} />
                 </button>
@@ -251,66 +250,68 @@ export default function PostList({ user }) {
           </form>
 
           {/* Table Actions */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex space-x-2">
-              <button
-                onClick={handleCreate}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
-              >
-                <Plus size={16} />
-                <span>Create</span>
-              </button>
-
-              {/* File Upload Button */}
-              <label className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 cursor-pointer">
-                <Upload size={16} />
-                <span>Upload</span>
-                <input
-                  type="file"
-                  accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.zip,.rar"
-                  onChange={handleUpload}
-                  className="hidden"
-                />
-              </label>
-
-              {/* Download Button - Disabled if no rows selected */}
-              <button
-                onClick={handleDownload}
-                disabled={selectedRows.size === 0}
-                className={`px-4 py-2 ${
-                  selectedRows.size === 0
-                    ? "bg-green-600/50 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                } text-white rounded-lg transition-colors duration-200 flex items-center space-x-2`}
-              >
-                <Download size={16} />
-                <span>Download</span>
-              </button>
-
-              {/* Delete Button - Disabled if no rows selected */}
-              <button
-                onClick={handleDelete}
-                disabled={selectedRows.size === 0}
-                className={`px-4 py-2 ${
-                  selectedRows.size === 0
-                    ? "bg-red-600/50 cursor-not-allowed"
-                    : "bg-red-600 hover:bg-red-700"
-                } text-white rounded-lg transition-colors duration-200 flex items-center space-x-2`}
-              >
-                <Trash2 size={16} />
-                <span>Delete</span>
-              </button>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <span className="text-white">1-10/37 items</span>
-              <div className="flex space-x-1">
-                <button className="p-2 bg-blue-500/30 text-white rounded-lg hover:bg-blue-500/50 transition-colors">
-                  &lt;
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleCreate}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <Plus size={16} />
+                  <span>Create</span>
                 </button>
-                <button className="p-2 bg-blue-500/30 text-white rounded-lg hover:bg-blue-500/50 transition-colors">
-                  &gt;
+
+                {/* File Upload Button */}
+                <label className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 cursor-pointer">
+                  <Upload size={16} />
+                  <span>Upload</span>
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.zip,.rar"
+                    onChange={handleUpload}
+                    className="hidden"
+                  />
+                </label>
+
+                {/* Download Button - Disabled if no rows selected */}
+                <button
+                  onClick={handleDownload}
+                  disabled={selectedRows.size === 0}
+                  className={`px-4 py-2 ${
+                    selectedRows.size === 0
+                      ? "bg-green-600/50 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700"
+                  } text-white rounded-lg transition-colors duration-200 flex items-center space-x-2`}
+                >
+                  <Download size={16} />
+                  <span>Download</span>
                 </button>
+
+                {/* Delete Button - Disabled if no rows selected */}
+                <button
+                  onClick={handleDelete}
+                  disabled={selectedRows.size === 0}
+                  className={`px-4 py-2 ${
+                    selectedRows.size === 0
+                      ? "bg-red-600/50 cursor-not-allowed"
+                      : "bg-red-600 hover:bg-red-700 cursor-pointer "
+                  } text-white  rounded-lg transition-colors duration-200 flex items-center space-x-2`}
+                >
+                  <Trash2 size={16} />
+                  <span>Delete</span>
+                </button>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <span className="text-white">1-10/37 items</span>
+                <div className="flex space-x-1">
+                  <button className="p-2 bg-blue-500/30 cursor-pointer text-white rounded-lg hover:bg-blue-500/50 transition-colors">
+                    &lt;
+                  </button>
+                  <button className="p-2 bg-blue-500/30 cursor-pointer text-white rounded-lg hover:bg-blue-500/50 transition-colors">
+                    &gt;
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -320,7 +321,7 @@ export default function PostList({ user }) {
             <div className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead>
+                  <thead className="bg-white/0.5 backdrop-blur-lg">
                     <tr className="border-b border-white/20">
                       <th className="px-6 py-4 text-left">
                         <input
@@ -356,14 +357,18 @@ export default function PostList({ user }) {
                         key={post.id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="border-b border-white/10 hover:bg-white/5 transition-colors"
+                        onClick={() => navigate(`/post/${post.id}`)}
+                        className="border-b cursor-pointer border-white/10 hover:bg-white/5 transition-colors"
                       >
                         <td className="px-6 py-4">
                           <input
                             type="checkbox"
                             checked={selectedRows.has(post.id)}
-                            onChange={() => handleRowSelect(post.id)}
-                            className="w-4 h-4 text-purple-600 bg-white/10 border-white/30 rounded focus:ring-purple-500 focus:ring-2"
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              handleRowSelect(post.id);
+                            }}
+                            className="w-4 h-4 text-purple-600 cursor-pointer bg-white/10 border-white/30 rounded focus:ring-purple-500 focus:ring-2"
                           />
                         </td>
                         <td className="px-6 py-4 text-white">{post.id}</td>
@@ -386,7 +391,7 @@ export default function PostList({ user }) {
                         </td>
                         <td className="px-6 py-4 text-white">{post.date}</td>
                         <td className="px-6 py-4">
-                          <button className="p-2 text-purple-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                          <button className="p-2 cursor-pointer text-purple-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                             <Edit size={16} />
                           </button>
                         </td>
@@ -429,13 +434,13 @@ export default function PostList({ user }) {
                 <div className="flex justify-end space-x-3">
                   <button
                     onClick={cancelDelete}
-                    className="px-4 py-2 text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                    className="px-4 py-2 text-white cursor-pointer bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={confirmDelete}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                    className="px-4 py-2 bg-red-600 cursor-pointer hover:bg-red-700 text-white rounded-lg transition-colors"
                   >
                     Delete
                   </button>
