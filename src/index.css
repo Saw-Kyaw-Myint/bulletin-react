@@ -1,1 +1,32 @@
 @import "tailwindcss";
+
+@theme {
+  --color-chocolate: #d2691e;
+  --color-chocolate-dark: #8b4513;
+}
+
+@layer components {
+  .background-cyan {
+    @apply bg-gradient-to-br from-slate-800 via-cyan-800 to-slate-900;
+  }
+
+  .button-cyan {
+    @apply cursor-pointer bg-gradient-to-r from-cyan-600 to-slate-600 hover:from-cyan-600 text-white font-semibold hover:shadow-white/25;
+  }
+
+  .icon-cyan {
+    @apply text-cyan-300;
+  }
+
+  .background-purple {
+    @apply bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800;
+  }
+
+  .button-purple {
+    @apply bg-gradient-to-r cursor-pointer from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold hover:shadow-purple-500/25;
+  }
+
+  .icon-purple {
+    @apply text-purple-300;
+  }
+}

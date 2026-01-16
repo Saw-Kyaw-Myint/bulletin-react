@@ -16,7 +16,7 @@ import DatePicker from "../../components/DatePicker";
 import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import FormInput from "../../components/Form/FormInput";
-import FormSelect from "../../components/Form/FormSelecte";
+import FormSelect from "../../components/Form/FormSelect";
 import SearchActionButtons from "../../components/SearchActionButton";
 import ConfirmModal from "../../components/ConfirmModel";
 import DataTable from "../../components/DataTable";
