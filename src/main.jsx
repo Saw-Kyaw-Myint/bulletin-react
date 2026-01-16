@@ -6,6 +6,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { CookiesProvider } from "react-cookie";
+import "./provider/axios.interceptor.js";
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(

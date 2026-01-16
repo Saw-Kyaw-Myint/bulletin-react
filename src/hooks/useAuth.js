@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { login } from "../api/authApi";
+import { login } from "../api/auth";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import useAuthStore from "../store/useAuthStore";

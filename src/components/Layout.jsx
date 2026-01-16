@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { format, parseISO } from "date-fns";
 import {
   Users,
   FileText,
@@ -18,6 +17,7 @@ import useAuthStore from "../store/useAuthStore";
 import { Role } from "../constants/commons";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import { dateFormat } from "../utils/date";
 
 export default function Layout({ children, activeRoute }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -119,12 +119,7 @@ export default function Layout({ children, activeRoute }) {
               className="text-white text-sm"
             >
               <span className="opacity-70 font-bold italic">Last Login : </span>
-              {useAuthStore.getState().user?.last_login_at
-                ? format(
-                    parseISO(useAuthStore.getState().user?.last_login_at),
-                    "dd-MM-yyyy"
-                  )
-                : ""}
+              {dateFormat(useAuthStore.getState().user?.last_login_at)}
             </motion.div>
 
             <motion.div

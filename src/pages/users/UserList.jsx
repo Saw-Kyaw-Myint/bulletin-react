@@ -3,12 +3,20 @@ import React, { useEffect, useState } from "react";
 import { Settings, Lock, Unlock, Trash2, Edit3, Key } from "lucide-react";
 import DatePicker from "../../components/DatePicker";
 import DataTable from "../../components/DataTable";
-import ConfirmModal from "../../components/ConfirmModel";
+import ConfirmModel from "../../components/ConfirmModel";
 import Loading from "../../components/Loading";
 import SearchActionButtons from "../../components/SearchActionButton";
 import FormSelect from "../../components/Form/FormSelect";
 import FormInput from "../../components/Form/FormInput";
 import { useNavigate } from "react-router-dom";
+import {
+  deleteUsers,
+  lockUser,
+  unlockUser,
+  userList,
+} from "../../hooks/useUser";
+import { Role, userStatus } from "../../constants/commons";
+import { dateFormat } from "../../utils/date";
 
 const UsersList = () => {
   const userTableHeaders = [
@@ -23,80 +31,26 @@ const UsersList = () => {
 
   const roleOptions = [
     { value: "", label: "All Roles" },
-    { value: "admin", label: "Administrator" },
-    { value: "moderator", label: "Moderator" },
-    { value: "user", label: "User" },
-    { value: "guest", label: "Guest" },
+    { value: 0, label: "Admin" },
+    { value: 1, label: "User" },
   ];
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchForm, setSearchForm] = useState({
     name: "",
     email: "",
     role: "",
-    startDate: "",
-    endDate: "",
+    start_date: null,
+    end_date: null,
   });
-
-  // Mock user data
-  const mockUsers = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      role: "admin",
-      status: "active",
-      createdDate: "01/12/2025",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@example.com",
-      role: "moderator",
-      status: "inactive",
-      createdDate: "01/10/2025",
-    },
-    {
-      id: 3,
-      name: "Bob Johnson",
-      email: "bob.johnson@example.com",
-      role: "user",
-      status: "active",
-      createdDate: "01/08/2025",
-    },
-    {
-      id: 4,
-      name: "Alice Brown",
-      email: "alice.brown@example.com",
-      role: "guest",
-      status: "inactive",
-      createdDate: "01/05/2025",
-    },
-    {
-      id: 5,
-      name: "Charlie Wilson",
-      email: "charlie.wilson@example.com",
-      role: "user",
-      status: "active",
-      createdDate: "12/20/2024",
-    },
-  ];
 
   const [selectAll, setSelectAll] = useState(false);
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [openSettings, setOpenSettings] = useState(null);
   const [showConfirmUnlock, setShowConfirmUnlock] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500); // Simulate 1.5 seconds of loading
-
-    return () => clearTimeout(timer);
-  }, []);
+  const [page, setPage] = useState(1);
+  const [params, setParams] = useState(null);
 
   const handleSearchChange = (e) => {
     const { name, value } = e.target;
@@ -108,13 +62,16 @@ const UsersList = () => {
       name: "",
       email: "",
       role: "",
-      startDate: "",
-      endDate: "",
+      start_date: "",
+      end_date: "",
     });
+
+    setParams(null);
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    setParams(searchForm);
     console.log("Search submitted:", searchForm);
   };
 
@@ -123,7 +80,7 @@ const UsersList = () => {
     setSelectAll(newSelectAll);
     const newSelectedRows = new Set();
     if (newSelectAll) {
-      mockUsers.forEach((user) => newSelectedRows.add(user.id));
+      usersData.data.forEach((user) => newSelectedRows.add(user.id));
     }
     setSelectedRows(newSelectedRows);
   };
@@ -136,18 +93,13 @@ const UsersList = () => {
       newSelectedRows.add(userId);
     }
     setSelectedRows(newSelectedRows);
-    setSelectAll(newSelectedRows.size === mockUsers.length);
+    setSelectAll(newSelectedRows.size === usersData.data.length);
   };
 
   const handleLockUnlock = () => {
     if (selectedRows.size > 0) {
       setShowConfirmUnlock(true);
     }
-  };
-
-  const confirmUnlock = () => {
-    console.log("Lock/Unlock selected users:", Array.from(selectedRows));
-    setShowConfirmUnlock(false);
   };
 
   const cancelUnlock = () => {
@@ -158,13 +110,6 @@ const UsersList = () => {
     if (selectedRows.size > 0) {
       setShowConfirmDelete(true);
     }
-  };
-
-  const confirmDelete = () => {
-    console.log("Delete selected users:", Array.from(selectedRows));
-    setSelectedRows(new Set());
-    setSelectAll(false);
-    setShowConfirmDelete(false);
   };
 
   const cancelDelete = () => {
@@ -185,6 +130,53 @@ const UsersList = () => {
     setOpenSettings(null);
   };
 
+  const { data: usersData, isLoading } = userList({ page, ...params });
+  const { mutate: lockUserFn, isLoading: isLockUserLoading } = lockUser();
+  const { mutate: unLockUserFn, isLoading: isUnlockUserLoading } = unlockUser();
+  const { mutate: deleteUserFn, isLoading: isDeleteUserLoading } =
+    deleteUsers();
+
+  const isLockFunction = usersData?.data.some(
+    (user) => selectedRows.has(user.id) && user.lock_flg === false
+  );
+
+  const resetSelectedRows = () => {
+    setSelectedRows(new Set());
+    setSelectAll(false);
+  };
+
+  const confirmUnlock = async () => {
+    if (isLockFunction) {
+      try {
+        const payload = { user_ids: Array.from(selectedRows) };
+        await lockUserFn(payload);
+        resetSelectedRows();
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      try {
+        const payload = { user_ids: Array.from(selectedRows) };
+        await unLockUserFn(payload);
+        resetSelectedRows();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    setShowConfirmUnlock(false);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const payload = { user_ids: Array.from(selectedRows) };
+      await deleteUserFn(payload);
+      resetSelectedRows();
+    } catch (error) {
+      console.error(error);
+    }
+    setShowConfirmDelete(false);
+  };
+
   return (
     <div>
       <Layout activeRoute="user-list">
@@ -194,7 +186,6 @@ const UsersList = () => {
               <Loading />
             ) : (
               <>
-                {" "}
                 {/* Search Form */}
                 <div className="relative z-10">
                   <form
@@ -215,7 +206,7 @@ const UsersList = () => {
                       {/* Email */}
                       <FormInput
                         label="Email"
-                        type="email"
+                        type="text"
                         name="email"
                         value={searchForm.email}
                         onChange={handleSearchChange}
@@ -237,11 +228,11 @@ const UsersList = () => {
                         </label>
                         <DatePicker
                           name="startDate"
-                          value={searchForm.startDate}
+                          value={searchForm.start_date}
                           onChange={(e) =>
                             setSearchForm((prev) => ({
                               ...prev,
-                              startDate: e.target.value,
+                              start_date: e.target.value,
                             }))
                           }
                           placeholder="Select start date"
@@ -256,11 +247,11 @@ const UsersList = () => {
                         </label>
                         <DatePicker
                           name="endDate"
-                          value={searchForm.endDate}
+                          value={searchForm.end_date}
                           onChange={(e) =>
                             setSearchForm((prev) => ({
                               ...prev,
-                              endDate: e.target.value,
+                              end_date: e.target.value,
                             }))
                           }
                           placeholder="Select end date"
@@ -279,18 +270,18 @@ const UsersList = () => {
                     <div className="flex space-x-2">
                       <button
                         onClick={handleLockUnlock}
-                        disabled={selectedRows.size === 0}
+                        disabled={
+                          selectedRows.size === 0 ||
+                          isLockUserLoading ||
+                          isUnlockUserLoading
+                        }
                         className={`px-4 py-2 ${
                           selectedRows.size === 0
                             ? "bg-yellow-600/50 cursor-not-allowed"
                             : "bg-yellow-600 hover:bg-yellow-700"
-                        } text-white rounded-lg transition-colors duration-200 flex items-center space-x-2`}
+                        } text-white cursor-pointer rounded-lg transition-colors duration-200 flex items-center space-x-2 disabled:cursor-not-allowed`}
                       >
-                        {mockUsers.some(
-                          (user) =>
-                            selectedRows.has(user.id) &&
-                            user.status === "active"
-                        ) ? (
+                        {isLockFunction ? (
                           <>
                             <Lock size={16} />
                             <span>Lock</span>
@@ -305,12 +296,14 @@ const UsersList = () => {
 
                       <button
                         onClick={handleDelete}
-                        disabled={selectedRows.size === 0}
+                        disabled={
+                          selectedRows.size === 0 || isDeleteUserLoading
+                        }
                         className={`px-4 py-2 ${
                           selectedRows.size === 0
                             ? "bg-red-600/50 cursor-not-allowed"
                             : "bg-red-600 hover:bg-red-700"
-                        } text-white rounded-lg transition-colors duration-200 flex items-center space-x-2`}
+                        } text-white cursor-pointer rounded-lg transition-colors duration-200 flex items-center space-x-2 disabled:cursor-not-allowed`}
                       >
                         <Trash2 size={16} />
                         <span>Delete</span>
@@ -318,12 +311,28 @@ const UsersList = () => {
                     </div>
 
                     <div className="flex items-center space-x-4">
-                      <span className="text-white">1-10/37 items</span>
+                      <span className="text-white">
+                        {`${usersData?.meta.page}-${usersData?.meta.pages}/${usersData?.meta?.total}`}{" "}
+                        items
+                      </span>
                       <div className="flex space-x-1">
-                        <button className="p-2 bg-blue-500/30 text-white rounded-lg hover:bg-blue-500/50 transition-colors">
+                        <button
+                          className="p-2 bg-purple-500/60 cursor-pointer text-white rounded-lg hover:bg-purple-500/50 transition-colors disabled:cursor-not-allowed disabled:hover:bg-purple-900 disabled:bg-purple-900"
+                          disabled={
+                            usersData.meta.page == 1 || !usersData.meta.pages
+                          }
+                          onClick={() => setPage(usersData.meta.page - 1)}
+                        >
                           &lt;
                         </button>
-                        <button className="p-2 bg-blue-500/30 text-white rounded-lg hover:bg-blue-500/50 transition-colors">
+                        <button
+                          className="p-2 bg-purple-500/60 cursor-pointer text-white rounded-lg hover:bg-purple-500/50 transition-colors disabled:cursor-not-allowed disabled:hover:bg-purple-900 disabled:bg-purple-900"
+                          onClick={() => setPage(usersData.meta.page + 1)}
+                          disabled={
+                            page == usersData.meta.pages ||
+                            !usersData.meta.pages
+                          }
+                        >
                           &gt;
                         </button>
                       </div>
@@ -333,7 +342,7 @@ const UsersList = () => {
                 {/* Users Table */}
                 <DataTable
                   headers={userTableHeaders}
-                  data={mockUsers}
+                  data={usersData.data}
                   selectAll={selectAll}
                   onSelectAll={handleSelectAll}
                   emptyState={
@@ -376,24 +385,24 @@ const UsersList = () => {
 
                       <td className="px-6 py-4">
                         <span className="px-2 py-1 bg-blue-500/30 text-blue-300 rounded-full text-xs">
-                          {user.role}
+                          {Role[user.role]}
                         </span>
                       </td>
 
                       <td className="px-6 py-4">
                         <span
                           className={`px-2 py-1 rounded-full text-xs ${
-                            user.status === "active"
+                            user.lock_flg === true
                               ? "bg-green-500/30 text-green-300"
                               : "bg-red-500/30 text-red-300"
                           }`}
                         >
-                          {user.status}
+                          {userStatus[user.lock_flg]}
                         </span>
                       </td>
 
                       <td className="px-6 py-4 text-white">
-                        {user.createdDate}
+                        {dateFormat(user.created_at)}
                       </td>
 
                       <td className="px-6 py-4">
@@ -442,18 +451,11 @@ const UsersList = () => {
         </main>
       </Layout>
       {/* Confirm Unlock Modal */}
-      <ConfirmModal
+      <ConfirmModel
         open={showConfirmUnlock}
         title="Confirm Lock/Unlock"
         description={`Are you sure you want to
-                  ${
-                    mockUsers.some(
-                      (user) =>
-                        selectedRows.has(user.id) && user.status === "active"
-                    )
-                      ? "lock"
-                      : "unlock"
-                  }
+                  ${isLockFunction ? "lock" : "unlock"}
                   ${selectedRows.size} selected
                   ${
                     selectedRows.size !== 1 ? "users?" : "user?"
@@ -461,18 +463,12 @@ const UsersList = () => {
                   undone.`}
         onCancel={cancelUnlock}
         onConfirm={confirmUnlock}
-        confirmText={
-          mockUsers.some(
-            (user) => selectedRows.has(user.id) && user.status === "active"
-          )
-            ? "Lock"
-            : "Unlock"
-        }
+        confirmText={isLockFunction ? "Lock" : "Unlock"}
         cancelText="Cancel"
       />
 
       {/* Confirm Delete Modal */}
-      <ConfirmModal
+      <ConfirmModel
         open={showConfirmDelete}
         title="Confirm Deletion"
         description={`Are you sure you want to delete ${

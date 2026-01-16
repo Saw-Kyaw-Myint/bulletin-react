@@ -1,5 +1,5 @@
 // Simple date picker component
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const DatePicker = ({ value, onChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +40,10 @@ const DatePicker = ({ value, onChange, placeholder }) => {
 
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth());
+
+  useEffect(() => {
+    setSelectedDate(value || "");
+  }, [value]);
 
   return (
     <div className="relative !z-10">
