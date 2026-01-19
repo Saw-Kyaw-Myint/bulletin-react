@@ -11,18 +11,23 @@ import {
   ArrowLeft,
   Settings,
   RefreshCw,
+  UserPlus,
 } from "lucide-react";
 
 import DatePicker from "../../components/DatePicker";
 import Loading from "../../components/Loading";
+import { createUser } from "../../hooks/useUser";
+import FormSelect from "../../components/Form/FormSelect";
+import { userRolesOptions } from "../../constants/commons";
+import ErrorMessage from "../../components/ErrorMessage";
 
 const UserCreate = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    password_confirm: "",
-    role: "user",
+    confirm_password: "",
+    role: 1,
     phone: "",
     dob: "",
     address: "",
@@ -30,10 +35,12 @@ const UserCreate = () => {
   });
   const [previewImage, setPreviewImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrorMessage(null);
   };
 
   const handleFileChange = (e) => {
@@ -43,6 +50,7 @@ const UserCreate = () => {
       const reader = new FileReader();
       reader.onload = (e) => setPreviewImage(e.target.result);
       reader.readAsDataURL(file);
+      setErrorMessage(null);
     }
   };
 
@@ -51,8 +59,8 @@ const UserCreate = () => {
       name: "",
       email: "",
       password: "",
-      password_confirm: "",
-      role: "user",
+      confirm_password: "",
+      role: 1,
       phone: "",
       dob: "",
       address: "",
@@ -61,23 +69,39 @@ const UserCreate = () => {
     setPreviewImage(null);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Handle form submission logic here
-  };
+  const mutation = createUser();
 
-  const roles = [
-    { value: "admin", label: "Administrator" },
-    { value: "moderator", label: "Moderator" },
-    { value: "user", label: "User" },
-    { value: "guest", label: "Guest" },
-  ];
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && !!value) {
+        data.append(key, value);
+      }
+    });
+
+    if (formData.profile) {
+      data.append("profile", formData.profile);
+    } else {
+      data.append("profile", "");
+    }
+
+    mutation.mutate(data, {
+      onSuccess: (res) => {
+        alert(res?.message);
+        handleReset();
+      },
+      onError: (error) => {
+        setErrorMessage(error.response.data.errors || "Login failed");
+      },
+    });
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -92,8 +116,20 @@ const UserCreate = () => {
               onSubmit={handleSubmit}
               className="bg-white/10 backdrop-blur-lg rounded-xl p-8 border border-white/20"
             >
+              {/* Card Title */}
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <UserPlus size={20} className="mr-2" />
+                  Create User
+                </h2>
+                <p className="text-purple-200 text-sm mt-1">
+                  create user account
+                </p>
+              </div>
+
               {/* Profile Picture - Top and Centered */}
-              <div className="flex justify-center mb-8">
+
+              <div className="flex flex-col justify-center items-center mb-8">
                 <div className="relative">
                   <input
                     type="file"
@@ -118,6 +154,7 @@ const UserCreate = () => {
                     )}
                   </label>
                 </div>
+                <ErrorMessage message={errorMessage?.profile} />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -136,8 +173,8 @@ const UserCreate = () => {
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
                       placeholder="Enter full name"
-                      required
                     />
+                    <ErrorMessage message={errorMessage?.name} />
                   </div>
 
                   {/* Email */}
@@ -153,8 +190,8 @@ const UserCreate = () => {
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
                       placeholder="Enter email address"
-                      required
                     />
+                    <ErrorMessage message={errorMessage?.email} />
                   </div>
 
                   {/* Password */}
@@ -170,8 +207,8 @@ const UserCreate = () => {
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
                       placeholder="Enter password"
-                      required
                     />
+                    <ErrorMessage message={errorMessage?.password} />
                   </div>
 
                   {/* Confirm Password */}
@@ -182,13 +219,13 @@ const UserCreate = () => {
                     </label>
                     <input
                       type="password"
-                      name="password_confirm"
-                      value={formData.password_confirm}
+                      name="confirm_password"
+                      value={formData.confirm_password}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
                       placeholder="Confirm password"
-                      required
                     />
+                    <ErrorMessage message={errorMessage?.confirm_password} />
                   </div>
                 </div>
 
@@ -200,22 +237,14 @@ const UserCreate = () => {
                       <Settings size={16} className="mr-2" />
                       Role
                     </label>
-                    <select
+                    <FormSelect
                       name="role"
                       value={formData.role}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 appearance-none"
-                    >
-                      {roles.map((role) => (
-                        <option
-                          key={role.value}
-                          value={role.value}
-                          className="bg-gray-800"
-                        >
-                          {role.label}
-                        </option>
-                      ))}
-                    </select>
+                      options={userRolesOptions}
+                      className="!py-3"
+                    />
+                    <ErrorMessage message={errorMessage?.role} />
                   </div>
 
                   {/* Phone */}
@@ -232,6 +261,7 @@ const UserCreate = () => {
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
                       placeholder="Enter phone number"
                     />
+                    <ErrorMessage message={errorMessage?.phone} />
                   </div>
 
                   {/* Date of Birth */}
@@ -246,6 +276,7 @@ const UserCreate = () => {
                       onChange={handleInputChange}
                       placeholder="Select date of birth"
                     />
+                    <ErrorMessage message={errorMessage?.dob} />
                   </div>
 
                   {/* Address */}
@@ -262,6 +293,7 @@ const UserCreate = () => {
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 resize-none"
                       placeholder="Enter full address"
                     />
+                    <ErrorMessage message={errorMessage?.address} />
                   </div>
                 </div>
               </div>

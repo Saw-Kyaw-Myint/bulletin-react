@@ -72,7 +72,6 @@ const UsersList = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setParams(searchForm);
-    console.log("Search submitted:", searchForm);
   };
 
   const handleSelectAll = () => {

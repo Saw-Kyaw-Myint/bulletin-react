@@ -26,7 +26,7 @@ client.interceptors.response.use(
     const status = error?.response?.status;
 
     if (status == 401) {
-      console.warn("401 Unauthorized → logging out");
+      alert("401 Unauthorized → logging out");
       cookies.remove(TOKEN.ACCESS_TOKEN, { path: "/" });
       useAuthStore.getState().logout();
       window.location.href = "/";

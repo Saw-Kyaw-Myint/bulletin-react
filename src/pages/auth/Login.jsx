@@ -29,7 +29,7 @@ export default function Login() {
     mutation.mutate(
       { email, password, rememberMe },
       {
-        onSuccess: (error) => {
+        onSuccess: (data) => {
           navigate("/posts");
         },
         onError: (error) => {

@@ -4,8 +4,9 @@ export const AUTH = {
 
 export const USER = {
   LIST: "/users/",
-  MULTIPLE_DELETE: "/users/multiple-delete",
+  CREATE: "/users/create",
   LOCK: "/users/lock",
   UNLOCK: "/users/unlock",
-  DELETE: "/users/multiple-delete",
+  DELETE: "/users/delete",
+  MULTIPLE_DELETE: "/users/multiple-delete",
 };

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteUsersApi,
+  userCreateApi,
   userListApi,
   userLockApi,
   userUnlockApi,
@@ -11,6 +12,19 @@ export const userList = (params) => {
     queryKey: ["users", params],
     queryFn: () => userListApi(params),
     keepPreviousData: true,
+  });
+};
+
+export const createUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: userCreateApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
   });
 };
 

@@ -3,6 +3,11 @@ export const Role = {
   false: "Admin",
 };
 
+export const userRolesOptions = [
+  { value: 0, label: "admin" },
+  { value: 1, label: "User" },
+];
+
 export const userStatus = {
   true: "Lock",
   false: "Unlock",

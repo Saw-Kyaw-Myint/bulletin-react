@@ -1,13 +1,13 @@
 // Simple date picker component
 import React, { useEffect, useState } from "react";
 
-const DatePicker = ({ value, onChange, placeholder }) => {
+const DatePicker = ({ name, value, onChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(value || "");
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-    onChange({ target: { name: "postDate", value: date } });
+    onChange({ target: { name: name, value: date } });
     setIsOpen(false);
   };
 

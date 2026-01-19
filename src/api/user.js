@@ -6,6 +6,13 @@ export const userListApi = async (params = {}) => {
   return response.data;
 };
 
+export const userCreateApi = async (payload) => {
+  const response = await client.post(USER.CREATE, payload, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
 export const userLockApi = async (payload) => {
   const response = await client.post(USER.LOCK, payload);
   return response.data;
@@ -17,6 +24,6 @@ export const userUnlockApi = async (payload) => {
 };
 
 export const deleteUsersApi = async (payload) => {
-  const response = await client.post(USER.DELETE, payload);
+  const response = await client.post(USER.MULTIPLE_DELETE, payload);
   return response.data;
 };
