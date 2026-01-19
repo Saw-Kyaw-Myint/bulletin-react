@@ -20,14 +20,17 @@ import { createUser } from "../../hooks/useUser";
 import FormSelect from "../../components/Form/FormSelect";
 import { userRolesOptions } from "../../constants/commons";
 import ErrorMessage from "../../components/ErrorMessage";
+import useAuthStore from "../../store/useAuthStore";
 
 const UserCreate = () => {
+  const { user } = useAuthStore();
   const [formData, setFormData] = useState({
+    user_id: user?.id,
     name: "",
     email: "",
     password: "",
     confirm_password: "",
-    role: 1,
+    role: "",
     phone: "",
     dob: "",
     address: "",
@@ -184,7 +187,7 @@ const UserCreate = () => {
                       Email
                     </label>
                     <input
-                      type="email"
+                      type="text"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}

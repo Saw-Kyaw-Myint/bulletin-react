@@ -11,6 +11,7 @@ import Login from "./pages/auth/Login";
 import UsersList from "./pages/users/UserList";
 import UserDetail from "./pages/users/UserDetail";
 import ChangePassword from "./pages/auth/ChangePassword";
+import UserEdit from "./pages/users/UserEdit";
 
 const App = () => {
   useAuthInit();
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/post/:id" element={<PostDetail />} />
         <Route path="/users" element={<UsersList />} />
         <Route path="/user/create" element={<UserCreate />} />
+        <Route path="/user/edit/:id" element={<UserEdit />} />
         <Route path="/user/:id" element={<UserDetail />} />
         <Route path="/user/change-password" element={<ChangePassword />} />
       </Route>

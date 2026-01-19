@@ -121,6 +121,7 @@ const UsersList = () => {
 
   const handleEdit = (userId) => {
     console.log("Edit user:", userId);
+    navigate(`/user/edit/${userId}`);
     setOpenSettings(null);
   };
 

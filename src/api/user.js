@@ -6,8 +6,21 @@ export const userListApi = async (params = {}) => {
   return response.data;
 };
 
+export const getUserApi = async (id) => {
+  console.log("id", id);
+  const response = await client.get(`${USER.SHOW}/${id}`);
+  return response.data;
+};
+
 export const userCreateApi = async (payload) => {
   const response = await client.post(USER.CREATE, payload, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+export const userUpdateApi = async (payload, id) => {
+  const response = await client.post(`${USER.UPDATE}/${id}`, payload, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return response.data;
