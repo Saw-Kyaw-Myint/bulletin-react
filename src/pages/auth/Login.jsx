@@ -11,7 +11,7 @@ import { useLogin } from "../../hooks/useAuth";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [remember, setRemember] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const mutation = useLogin();
@@ -27,7 +27,7 @@ export default function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     mutation.mutate(
-      { email, password, rememberMe },
+      { email, password, remember },
       {
         onSuccess: (data) => {
           navigate("/posts");
@@ -116,18 +116,18 @@ export default function Login() {
               <div className="relative">
                 <input
                   type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
                   className="sr-only"
                 />
                 <div
                   className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
-                    rememberMe
+                    remember
                       ? "bg-purple-500 border-purple-500"
                       : "border-white/30 hover:border-white/50"
                   }`}
                 >
-                  {rememberMe && (
+                  {remember && (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}

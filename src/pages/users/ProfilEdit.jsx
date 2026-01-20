@@ -1,35 +1,16 @@
 import Layout from "../../components/Layout";
 import React, { useEffect, useState } from "react";
-import {
-  User,
-  Mail,
-  Lock,
-  Phone,
-  Calendar,
-  MapPin,
-  Image,
-  RefreshCw,
-  Settings,
-  UserPlus,
-} from "lucide-react";
-import { useParams } from "react-router-dom";
-
-import DatePicker from "../../components/DatePicker";
 import Loading from "../../components/Loading";
-import FormSelect from "../../components/Form/FormSelect";
-import ErrorMessage from "../../components/ErrorMessage";
 
-import { userRolesOptions } from "../../constants/commons";
 import { getUser, updateUser } from "../../hooks/useUser";
-import { dateFormat, formatDateToISO } from "../../utils/date";
+import { formatDateToISO } from "../../utils/date";
 import useAuthStore from "../../store/useAuthStore";
 import UserEditForm from "../../components/Form/UserEditForm";
 
-const UserEdit = () => {
-  const { id } = useParams();
+const ProfileEdit = () => {
   const { user } = useAuthStore();
-  const { data, isLoading, isError, error } = getUser(id);
-  const mutation = updateUser(id);
+  const { data, isLoading, isError, error } = getUser(user.id);
+  const mutation = updateUser(user.id);
 
   const [formData, setFormData] = useState({
     user_id: user?.id,
@@ -47,7 +28,6 @@ const UserEdit = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [errorMessage, setErrorMessage] = useState({});
 
-  // When API data is loaded, populate formData
   useEffect(() => {
     if (data) {
       setFormData({
@@ -132,10 +112,11 @@ const UserEdit = () => {
     );
 
   return (
-    <Layout activeRoute="user-list">
+    <Layout>
       <main className="flex-1 p-6 overflow-y-auto">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <UserEditForm
+            formName="Update Profile"
             formData={formData}
             handleInputChange={handleInputChange}
             handleFileChange={handleFileChange}
@@ -150,4 +131,4 @@ const UserEdit = () => {
   );
 };
 
-export default UserEdit;
+export default ProfileEdit;

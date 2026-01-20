@@ -18,7 +18,6 @@ export const userList = (params) => {
 };
 
 export const getUser = (id) => {
-  console.log("use userid", id);
   return useQuery({
     queryKey: ["user", id],
     queryFn: () => getUserApi(id),

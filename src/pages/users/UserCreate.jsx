@@ -63,7 +63,7 @@ const UserCreate = () => {
       email: "",
       password: "",
       confirm_password: "",
-      role: 1,
+      role: "",
       phone: "",
       dob: "",
       address: "",

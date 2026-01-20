@@ -120,7 +120,6 @@ const UsersList = () => {
   };
 
   const handleEdit = (userId) => {
-    console.log("Edit user:", userId);
     navigate(`/user/edit/${userId}`);
     setOpenSettings(null);
   };
@@ -137,7 +136,7 @@ const UsersList = () => {
     deleteUsers();
 
   const isLockFunction = usersData?.data.some(
-    (user) => selectedRows.has(user.id) && user.lock_flg === false
+    (user) => selectedRows.has(user.id) && user.lock_flg === false,
   );
 
   const resetSelectedRows = () => {

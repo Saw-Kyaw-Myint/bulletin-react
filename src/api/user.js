@@ -7,7 +7,6 @@ export const userListApi = async (params = {}) => {
 };
 
 export const getUserApi = async (id) => {
-  console.log("id", id);
   const response = await client.get(`${USER.SHOW}/${id}`);
   return response.data;
 };

@@ -79,8 +79,8 @@ export default function Layout({ children, activeRoute }) {
   };
 
   const handleLogout = () => {
-    removeCookie("access_token", { path: "/" });
-    removeCookie("refresh_token", { path: "/" });
+    removeCookie("access_token");
+    removeCookie("refresh_token");
     logout();
     navigate("/", { replace: true });
   };
@@ -163,7 +163,12 @@ export default function Layout({ children, activeRoute }) {
               {isOpen && (
                 <div className="absolute transition duration-300 z-50 right-0 mt-2 w-48 bg-white/10 backdrop-blur-lg rounded-lg border border-white/20 shadow-lg">
                   <div className="py-2">
-                    <button className="w-full flex items-center px-4 py-2 text-white hover:bg-white/10 transition-colors">
+                    <button
+                      className="w-full cursor-pointer flex items-center px-4 py-2 text-white hover:bg-white/10 transition-colors"
+                      onClick={() => {
+                        navigate("/profile");
+                      }}
+                    >
                       <User size={16} className="mr-2" />
                       Profile
                     </button>

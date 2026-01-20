@@ -30,7 +30,6 @@ const PostCreate = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Post created:", formData);
     // Handle form submission logic here
   };
 

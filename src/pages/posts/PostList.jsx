@@ -153,7 +153,7 @@ export default function PostList({ user }) {
         // Process the file here
       } else {
         alert(
-          "Excel files are not allowed. Please upload a different file format."
+          "Excel files are not allowed. Please upload a different file format.",
         );
       }
     }

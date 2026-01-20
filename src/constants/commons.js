@@ -17,3 +17,5 @@ export const TOKEN = {
   ACCESS_TOKEN: "access_token",
   REFRESH_TOKEN: "refresh_token",
 };
+
+export const imagePath = `${import.meta.env.VITE_API_URL}/images`;

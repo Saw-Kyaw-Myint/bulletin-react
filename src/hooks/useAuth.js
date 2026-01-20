@@ -16,11 +16,9 @@ export const useLogin = () => {
       const decodedAccess = jwtDecode(data.access_token);
       const decodedRefresh = jwtDecode(data.refresh_token);
 
-      // 2️⃣ Extract expiry (UNIX timestamp in seconds)
       const accessTokenExpiresAt = new Date(decodedAccess.exp * 1000);
       const refreshTokenExpiresAt = new Date(decodedRefresh.exp * 1000);
 
-      // 3️⃣ Store RAW tokens in cookies
       setCookie("access_token", data.access_token, {
         expires: accessTokenExpiresAt,
         secure: true,
