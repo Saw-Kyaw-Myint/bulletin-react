@@ -1,9 +1,8 @@
-import { jwtDecode } from "jwt-decode";
 import { TOKEN } from "../constants/commons";
-import useAuthStore from "../store/useAuthStore";
 import client from "./axios";
 import { Cookies } from "react-cookie";
-import { useCookies } from "react-cookie";
+import { logout, saveTokenAndAuth } from "../lib/auth";
+import { refreshApi } from "../api/auth";
 
 const cookies = new Cookies();
 
@@ -19,61 +18,58 @@ client.interceptors.request.use(
   },
   (error) => Promise.reject(error),
 );
-let isRefreshing = false;
 
 /* ---------------- RESPONSE ---------------- */
+let isRefreshing = false;
+let queue = [];
 client.interceptors.response.use(
   (response) => response,
-
   async (error) => {
-    // const [, setCookie] = useCookies(["access_token"]);
-    // const setUser = useAuthStore((state) => state.setUser);
-    // const original = error.config;
+    const original = error.config;
+    const status = error?.response?.status;
 
-    // console.log("token error", error);
-    // const status = error?.response?.status;
+    if (status === 401 && !original._retry) {
+      original._retry = true;
 
-    // if (status == 401 && !original._retry) {
-    //   original._retry = true;
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          queue.push((token) => {
+            original.headers.Authorization = `Bearer ${token}`;
+            resolve(api(original));
+          });
+        });
+      }
 
-    //   if (isRefreshing) {
-    //     return new Promise((resolve) => {
-    //       original.headers.Authorization = `Bearer ${token}`;
-    //       resolve(api(original));
-    //     });
-    //   }
+      isRefreshing = true;
+      const refreshToken = getCookie(TOKEN.REFRESH_TOKEN);
+      try {
+        const response = await refreshApi(refreshToken);
+        const newAccessToken = response.access_token;
+        const newRefreshToken = response.refresh_token;
+        saveTokenAndAuth(TOKEN.ACCESS_TOKEN, newAccessToken);
+        saveTokenAndAuth(TOKEN.REFRESH_TOKEN, newRefreshToken, false);
 
-    //   isRefreshing = true;
-    //   try {
-    //     const res = await client.post("/refresh");
-    //     const newToken = res.data.access_token;
-    //     const decodedAccess = jwtDecode(newToken);
-    //     const accessTokenExpiresAt = new Date(decodedAccess.exp * 1000);
+        queue.forEach((cb) => cb(newAccessToken));
+        queue = [];
 
-    //     setCookie("access_token", data.access_token, {
-    //       expires: accessTokenExpiresAt,
-    //       secure: true,
-    //       sameSite: "strict",
-    //     });
-
-    //     setUser(decodedAccess.user);
-
-    //     queue.forEach((cb) => cb(newToken));
-    //     queue = [];
-
-    //     original.headers.Authorization = `Bearer ${newToken}`;
-    //     return api(original);
-    //   } catch (e) {
-    //     alert("401 Unauthorized → logging out");
-    //     cookies.remove(TOKEN.ACCESS_TOKEN, { path: "/" });
-    //     useAuthStore.getState().logout();
-    //     window.location.href = "/";
-    //     return Promise.reject(e);
-    //   } finally {
-    //     isRefreshing = false;
-    //   }
-    // }
+        original.headers.Authorization = `Bearer ${newAccessToken}`;
+        return client(original);
+      } catch (e) {
+        alert("401 Unauthorized → logging out");
+        logout();
+        window.location.href = "/";
+        return Promise.reject(e);
+      } finally {
+        isRefreshing = false;
+      }
+    }
 
     return Promise.reject(error);
   },
 );
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}

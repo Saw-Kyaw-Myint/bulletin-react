@@ -1,7 +1,32 @@
 import { AUTH } from "../constants/routes";
 import client from "../provider/axios";
 
-export const login = async ({ email, password, remember }) => {
-  const response = await client.post(AUTH.LOGIN, { email, password, remember });
+export const loginApi = async (payload) => {
+  const response = await client.post(AUTH.LOGIN, payload);
+  return response.data;
+};
+
+export const refreshApi = async (refreshToken) => {
+  const options = {
+    headers: {
+      Authorization: `Bearer ${refreshToken}`,
+      "X-Refresh-Token": refreshToken,
+    },
+  };
+  const response = await client.post("/refresh", {}, options);
+  return response.data;
+};
+
+export const logOutApi = async (refreshToken) => {
+  const options = {
+    method: "post",
+    credentials: true,
+    headers: {
+      Authorization: `Bearer ${refreshToken}`,
+      "X-Refresh-Token": refreshToken,
+    },
+  };
+  const response = await client.post(AUTH.LOGOUT, {}, options);
+
   return response.data;
 };

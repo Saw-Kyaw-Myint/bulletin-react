@@ -18,11 +18,12 @@ import { Role } from "../constants/commons";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { dateFormat } from "../utils/date";
+import { forceLogout } from "../lib/auth";
 
 export default function Layout({ children, activeRoute }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeMenu, setActiveMenu] = useState("post-list");
-  const { logout, user } = useAuthStore();
+  const { user } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [cookie, removeCookie] = useCookies(["access_token"]);
   const navigate = useNavigate();
@@ -79,9 +80,7 @@ export default function Layout({ children, activeRoute }) {
   };
 
   const handleLogout = () => {
-    removeCookie("access_token");
-    removeCookie("refresh_token");
-    logout();
+    forceLogout();
     navigate("/", { replace: true });
   };
 

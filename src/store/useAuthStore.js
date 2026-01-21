@@ -14,7 +14,7 @@ const useAuthStore = create(
             isAuthenticated: true,
           }),
 
-        logout: () =>
+        removeAuthUser: () =>
           set({
             user: null,
             isAuthenticated: false,
@@ -22,9 +22,9 @@ const useAuthStore = create(
       }),
       {
         name: "auth-storage",
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export default useAuthStore;

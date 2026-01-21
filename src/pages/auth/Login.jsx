@@ -26,17 +26,19 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutation.mutate(
-      { email, password, remember },
-      {
-        onSuccess: (data) => {
-          navigate("/posts");
-        },
-        onError: (error) => {
-          setErrorMessage(error.response.data.errors || "Login failed");
-        },
-      }
-    );
+    const payload = {
+      ...(email && { email }),
+      ...(password && { password }),
+      ...(remember && { remember }),
+    };
+    mutation.mutate(payload, {
+      onSuccess: (data) => {
+        navigate("/posts");
+      },
+      onError: (error) => {
+        setErrorMessage(error.response.data.errors || "Login failed");
+      },
+    });
   };
 
   return (
@@ -62,7 +64,7 @@ export default function Login() {
             <div className="relative">
               <Mail className="absolute z-10 left-4 top-1/2 transform -translate-y-1/2 icon-purple w-5 h-5" />
               <input
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => {
                   setErrorMessage(null);
