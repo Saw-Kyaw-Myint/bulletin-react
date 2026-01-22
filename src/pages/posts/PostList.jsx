@@ -80,7 +80,7 @@ export default function PostList() {
     setSelectAll(newSelectAll);
     const newSelectedRows = new Set();
     if (newSelectAll) {
-      posts.forEach((post) => newSelectedRows.add(post.id));
+      posts.data.forEach((post) => newSelectedRows.add(post.id));
     }
     setSelectedRows(newSelectedRows);
   };

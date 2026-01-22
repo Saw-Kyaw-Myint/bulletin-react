@@ -16,5 +16,6 @@ export const USER = {
 
 export const POST = {
   LIST: "/posts/",
+  SHOW: "/posts/show",
   MULTIPLE_DELETE: "/posts/multiple-delete",
 };
