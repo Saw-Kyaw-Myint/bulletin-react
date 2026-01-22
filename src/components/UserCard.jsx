@@ -7,13 +7,15 @@ const UserCard = ({ userDetail }) => {
     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 border border-white/20">
       {/* Profile Picture and Basic Info */}
       <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8 mb-8">
-        <div className="w-32 h-32 rounded-full overflow-hidden border-3 border-white/30">
-          <img
-            src={`${imagePath}/${userDetail?.profile_path}`}
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {userDetail?.profile_path && (
+          <div className="w-32 h-32 rounded-full overflow-hidden border-3 border-white/30">
+            <img
+              src={`${imagePath}/${userDetail?.profile_path}`}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
         <div className="text-center md:text-left">
           <h2 className="text-2xl font-bold text-white mb-2">
             {userDetail.name}
@@ -36,13 +38,15 @@ const UserCard = ({ userDetail }) => {
             </div>
           </div>
 
-          <div className="flex items-start space-x-3 mt-10">
-            <Phone className="text-purple-300 mt-1 flex-shrink-0" size={18} />
-            <div>
-              <p className="text-purple-300 text-xs font-medium">Phone</p>
-              <p className="text-white">{userDetail.phone}</p>
+          {userDetail.phone && (
+            <div className="flex items-start space-x-3 mt-10">
+              <Phone className="text-purple-300 mt-1 flex-shrink-0" size={18} />
+              <div>
+                <p className="text-purple-300 text-xs font-medium">Phone</p>
+                <p className="text-white">{userDetail.phone}</p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Right Column */}
@@ -54,18 +58,20 @@ const UserCard = ({ userDetail }) => {
               <p className="text-white">{userDetail.address}</p>
             </div>
           </div>
-          <div className="flex items-start space-x-3 mt-10">
-            <Calendar
-              className="text-purple-300 mt-1 flex-shrink-0"
-              size={18}
-            />
-            <div>
-              <p className="text-purple-300 text-xs font-medium">
-                Date of Birth
-              </p>
-              <p className="text-white">{dateFormat(userDetail.dob)}</p>
+          {userDetail.dob && (
+            <div className="flex items-start space-x-3 mt-10">
+              <Calendar
+                className="text-purple-300 mt-1 flex-shrink-0"
+                size={18}
+              />
+              <div>
+                <p className="text-purple-300 text-xs font-medium">
+                  Date of Birth
+                </p>
+                <p className="text-white">{dateFormat(userDetail.dob)}</p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

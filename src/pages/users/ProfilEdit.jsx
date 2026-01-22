@@ -11,6 +11,7 @@ const ProfileEdit = () => {
   const { user } = useAuthStore();
   const { data, isLoading, isError, error } = getUser(user.id);
   const mutation = updateUser(user.id);
+  const { setUser } = useAuthStore.getState();
 
   const [formData, setFormData] = useState({
     user_id: user?.id,
@@ -36,7 +37,7 @@ const ProfileEdit = () => {
         email: data.email || "",
         password: "",
         confirm_password: "",
-        role: Number(data.role) || 1,
+        role: Number(data.role) ? 1 : 0,
         phone: data.phone || "",
         dob: data.dob ? formatDateToISO(data.dob) : "",
         address: data.address || "",
@@ -72,7 +73,7 @@ const ProfileEdit = () => {
         email: data.email || "",
         password: "",
         confirm_password: "",
-        role: data.role || 1,
+        role: data.role ? 1 : 0 == 0 ? 0 : "",
         phone: data.phone || "",
         dob: data.dob || "",
         address: data.address || "",
@@ -96,6 +97,9 @@ const ProfileEdit = () => {
 
     mutation.mutate(form, {
       onSuccess: (res) => {
+        if (res.user) {
+          setUser(res.user);
+        }
         alert(res?.message || "User updated successfully");
       },
       onError: (err) => {
