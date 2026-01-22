@@ -17,7 +17,7 @@ import SearchActionButtons from "../../components/SearchActionButton";
 import ConfirmModal from "../../components/ConfirmModel";
 import DataTable from "../../components/DataTable";
 import Loading from "../../components/Loading";
-import { postList } from "../../hooks/usePost";
+import { deletePosts, postList } from "../../hooks/usePost";
 import { PostStatus } from "../../constants/commons";
 import { dateFormat } from "../../utils/date";
 import { truncateText } from "../../lib/common";
@@ -51,6 +51,8 @@ export default function PostList() {
   const [params, setParams] = useState(null);
 
   const navigate = useNavigate();
+  const { mutate: deleteUserFn, isLoading: isDeleteUserLoading } =
+    deletePosts();
 
   const handleSearchChange = (e) => {
     const { name, value } = e.target;
@@ -128,11 +130,18 @@ export default function PostList() {
     }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     console.log("Deleting selected posts:", Array.from(selectedRows));
-    setSelectedRows(new Set());
-    setSelectAll(false);
-    setShowConfirmDelete(true);
+    try {
+      const payload = { post_ids: Array.from(selectedRows) };
+      await deleteUserFn(payload);
+      setSelectedRows(new Set());
+      setSelectAll(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setShowConfirmDelete(false);
+    }
   };
 
   const cancelDelete = () => {
