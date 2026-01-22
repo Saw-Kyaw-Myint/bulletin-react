@@ -3,6 +3,8 @@ export const Role = {
   false: "Admin",
 };
 
+export const imagePath = `${import.meta.env.VITE_API_URL}/images`;
+
 export const userRolesOptions = [
   { value: 0, label: "admin" },
   { value: 1, label: "User" },
@@ -18,4 +20,7 @@ export const TOKEN = {
   REFRESH_TOKEN: "refresh_token",
 };
 
-export const imagePath = `${import.meta.env.VITE_API_URL}/images`;
+export const PostStatus = {
+  0: "inactive",
+  1: "active",
+};

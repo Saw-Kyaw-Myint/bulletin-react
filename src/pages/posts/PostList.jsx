@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   FileText,
-  Search,
-  RefreshCw,
   Edit,
   Plus,
   Upload,
@@ -10,10 +8,8 @@ import {
   Trash2,
   AlertTriangle,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import Layout from "../../components/Layout";
 import DatePicker from "../../components/DatePicker";
-import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import FormInput from "../../components/Form/FormInput";
 import FormSelect from "../../components/Form/FormSelect";
@@ -21,50 +17,16 @@ import SearchActionButtons from "../../components/SearchActionButton";
 import ConfirmModal from "../../components/ConfirmModel";
 import DataTable from "../../components/DataTable";
 import Loading from "../../components/Loading";
+import { postList } from "../../hooks/usePost";
+import { PostStatus } from "../../constants/commons";
+import { dateFormat } from "../../utils/date";
+import { truncateText } from "../../lib/common";
 
-export default function PostList({ user }) {
+export default function PostList() {
   const statusOptions = [
     { value: "", label: "All Status" },
-    { value: true, label: "Active" },
-    { value: false, label: "Inactive" },
-  ];
-  // Mock post data
-  const mockPosts = [
-    {
-      id: 1,
-      title: "Welcome to Our Platform",
-      description: "Introduction to our new bulletin board system",
-      status: "active",
-      date: "01/12/2025",
-    },
-    {
-      id: 2,
-      title: "System Maintenance Notice",
-      description: "Scheduled maintenance this weekend",
-      status: "active",
-      date: "01/10/2025",
-    },
-    {
-      id: 3,
-      title: "New Feature Announcement",
-      description: "Exciting new features coming soon",
-      status: "inactive",
-      date: "01/08/2025",
-    },
-    {
-      id: 4,
-      title: "Community Guidelines Update",
-      description: "Updated community guidelines and policies",
-      status: "active",
-      date: "01/05/2025",
-    },
-    {
-      id: 5,
-      title: "Holiday Schedule",
-      description: "Office closure during holiday season",
-      status: "inactive",
-      date: "12/20/2024",
-    },
+    { value: 1, label: "Active" },
+    { value: 0, label: "Inactive" },
   ];
 
   const postTableHeaders = [
@@ -77,23 +39,18 @@ export default function PostList({ user }) {
   ];
 
   const [searchForm, setSearchForm] = useState({
-    postName: "",
-    postDescription: "",
-    postStatus: "",
-    postDate: "",
+    name: "",
+    description: "",
+    status: "",
+    date: "",
   });
   const [selectAll, setSelectAll] = useState(false);
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [params, setParams] = useState(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const navigate = useNavigate();
 
   const handleSearchChange = (e) => {
     const { name, value } = e.target;
@@ -102,16 +59,17 @@ export default function PostList({ user }) {
 
   const handleSearchReset = () => {
     setSearchForm({
-      postName: "",
-      postDescription: "",
-      postStatus: "",
-      postDate: "",
+      name: "",
+      description: "",
+      status: "",
+      date: "",
     });
+    setParams(null);
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    console.log("Search submitted:", searchForm);
+    setParams(searchForm);
   };
 
   const handleSelectAll = (event) => {
@@ -120,7 +78,7 @@ export default function PostList({ user }) {
     setSelectAll(newSelectAll);
     const newSelectedRows = new Set();
     if (newSelectAll) {
-      mockPosts.forEach((post) => newSelectedRows.add(post.id));
+      posts.forEach((post) => newSelectedRows.add(post.id));
     }
     setSelectedRows(newSelectedRows);
   };
@@ -133,7 +91,7 @@ export default function PostList({ user }) {
       newSelectedRows.add(postId);
     }
     setSelectedRows(newSelectedRows);
-    setSelectAll(newSelectedRows.size === mockPosts.length);
+    setSelectAll(newSelectedRows.size === posts.length);
   };
 
   const handleCreate = () => {
@@ -181,6 +139,8 @@ export default function PostList({ user }) {
     setShowConfirmDelete(false);
   };
 
+  const { data: posts, isLoading } = postList({ page, ...params });
+
   return (
     <Layout activeRoute="post-list">
       {/* Main Content */}
@@ -200,8 +160,8 @@ export default function PostList({ user }) {
                   <FormInput
                     label="Post Name"
                     type="text"
-                    name="postName"
-                    value={searchForm.postName}
+                    name="name"
+                    value={searchForm.name}
                     onChange={handleSearchChange}
                     placeholder="Enter post name"
                   />
@@ -211,8 +171,8 @@ export default function PostList({ user }) {
                   <FormInput
                     label="Description"
                     type="text"
-                    name="postDescription"
-                    value={searchForm.postDescription}
+                    name="description"
+                    value={searchForm.description}
                     onChange={handleSearchChange}
                     placeholder="Enter description"
                   />
@@ -232,8 +192,8 @@ export default function PostList({ user }) {
                       Post Date
                     </label>
                     <DatePicker
-                      name="postDate"
-                      value={searchForm.postDate}
+                      name="date"
+                      value={searchForm.date}
                       onChange={handleSearchChange}
                       placeholder="Select date"
                     />
@@ -298,12 +258,23 @@ export default function PostList({ user }) {
                   </div>
 
                   <div className="flex items-center space-x-4">
-                    <span className="text-white">1-10/37 items</span>
+                    <span className="text-white">
+                      {`${posts?.meta.page}-${posts?.meta.pages}/${posts?.meta?.total}`}{" "}
+                      items
+                    </span>
                     <div className="flex space-x-1">
-                      <button className="p-2 bg-blue-500/30 cursor-pointer text-white rounded-lg hover:bg-blue-500/50 transition-colors">
+                      <button
+                        className="p-2 bg-purple-500/60 cursor-pointer text-white rounded-lg hover:bg-purple-500/50 transition-colors disabled:cursor-not-allowed disabled:hover:bg-purple-900 disabled:bg-purple-900"
+                        disabled={posts.meta.page == 1 || !posts.meta.pages}
+                        onClick={() => setPage(posts.meta.page - 1)}
+                      >
                         &lt;
                       </button>
-                      <button className="p-2 bg-blue-500/30 cursor-pointer text-white rounded-lg hover:bg-blue-500/50 transition-colors">
+                      <button
+                        className="p-2 bg-purple-500/60 cursor-pointer text-white rounded-lg hover:bg-purple-500/50 transition-colors disabled:cursor-not-allowed disabled:hover:bg-purple-900 disabled:bg-purple-900"
+                        onClick={() => setPage(posts.meta.page + 1)}
+                        disabled={page == posts.meta.pages || !posts.meta.pages}
+                      >
                         &gt;
                       </button>
                     </div>
@@ -314,7 +285,7 @@ export default function PostList({ user }) {
               {/* Posts Table */}
               <DataTable
                 headers={postTableHeaders}
-                data={mockPosts}
+                data={posts?.data}
                 selectAll={selectAll}
                 onSelectAll={handleSelectAll}
                 emptyState={
@@ -327,8 +298,6 @@ export default function PostList({ user }) {
                   </div>
                 }
                 renderRow={(post) => {
-                  const navigate = useNavigate();
-
                   return (
                     <>
                       <td className="px-6 py-4">
@@ -342,36 +311,38 @@ export default function PostList({ user }) {
                       </td>
 
                       <td
-                        className="px-6 py-4 text-white cursor-pointer"
+                        className="px-6 py-4 text-white cursor-pointer hover:underline"
                         onClick={() => navigate(`/post/${post.id}`)}
                       >
                         {post.id}
                       </td>
 
                       <td
-                        className="px-6 py-4 text-white font-medium cursor-pointer"
+                        className="px-6 py-4 text-white font-medium cursor-pointer hover:underline"
                         onClick={() => navigate(`/post/${post.id}`)}
                       >
-                        {post.title}
+                        {truncateText(post?.title, 25)}
                       </td>
 
-                      <td className="px-6 py-4 text-purple-200">
-                        {post.description}
+                      <td className="px-6 py-4 text-purple-200 hover:underline cursor-pointer">
+                        {truncateText(post.description)}
                       </td>
 
                       <td className="px-6 py-4">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            post.status === "active"
+                            post.status
                               ? "bg-green-500/30 text-green-300"
                               : "bg-red-500/30 text-red-300"
                           }`}
                         >
-                          {post.status}
+                          {PostStatus[post.status]}
                         </span>
                       </td>
 
-                      <td className="px-6 py-4 text-white">{post.date}</td>
+                      <td className="px-6 py-4 text-white">
+                        {dateFormat(post.created_at)}
+                      </td>
 
                       <td className="px-6 py-4">
                         <button className="p-2 cursor-pointer text-purple-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
