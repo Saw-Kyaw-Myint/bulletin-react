@@ -1,16 +1,60 @@
-# React + Vite
+# ⚛️ React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a **React application built with Vite**, providing a fast and modern development experience with **Hot Module Replacement (HMR)** and a clean project structure.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## React Compiler
+- ⚡ Fast development with **Vite**
+- 🔥 Hot Module Replacement (HMR)
+- ⚛️ React 18
+- 🧹 ESLint for code quality
+- 📦 Optimized production builds
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 📦 Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React**
+- **Vite**
+- **JavaScript (ESNext)**
+- **ESLint**
+
+---
+
+## 🛠️ Getting Started
+
+### 1️⃣ Install Dependencies
+
+```bash
+npm install
+```
+
+### 2️⃣ Copy .env
+
+```
+cp .env.example .env
+```
+
+Confirm `APi Endpoint` in .env file
+
+```
+http://127.0.0.1:5000/api
+```
+
+### 3️⃣ Run Development Server
+
+```
+npm run dev
+```
+
+The application will be available at:<br>
+`click` => <a _target="blank">http://localhost:5173
+</a>
+
+### 4️⃣ Production Build
+
+```
+npm run build
+```
