@@ -11,6 +11,16 @@ export const getPostApi = async (postId) => {
   return response.data;
 };
 
+export const createPostApi = async (payload) => {
+  const response = await client.post(POST.CREATE, payload);
+  return response.data;
+};
+
+export const updatePostApi = async (payload, id) => {
+  const response = await client.put(`${POST.UPDATE}/${id}`, payload);
+  return response.data;
+};
+
 export const deletePostsApi = async (payload) => {
   const response = await client.post(POST.MULTIPLE_DELETE, payload);
   return response.data;

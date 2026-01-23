@@ -55,7 +55,7 @@ client.interceptors.response.use(
         original.headers.Authorization = `Bearer ${newAccessToken}`;
         return client(original);
       } catch (e) {
-        alert("401 Unauthorized → logging out");
+        alert("401 Unauthorized → Please Login again.");
         logout();
         window.location.href = "/";
         return Promise.reject(e);

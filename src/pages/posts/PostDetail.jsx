@@ -1,22 +1,14 @@
-import {
-  FileText,
-  User,
-  Calendar,
-  Settings,
-  ArrowLeft,
-  Edit3,
-  Download,
-  Trash2,
-} from "lucide-react";
+import { FileText, User, Calendar, Edit3 } from "lucide-react";
 import Layout from "../../components/Layout";
 import { getPost } from "../../hooks/usePost";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PostStatus } from "../../constants/commons";
 import { dateFormat } from "../../utils/date";
 import Loading from "../../components/Loading";
 
 const PostDetail = () => {
   const params = useParams();
+  const navigate = useNavigate();
 
   const { data: postDetail, isLoading } = getPost(params.id);
 
@@ -31,7 +23,10 @@ const PostDetail = () => {
               {/* Action Buttons */}
               <div className="relative z-10">
                 <div className="flex justify-end space-x-3 mb-6">
-                  <button className="px-4 py-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2">
+                  <button
+                    onClick={() => navigate(`/post/edit/${params.id}`)}
+                    className="px-4 py-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                  >
                     <Edit3 size={16} />
                     <span>Edit</span>
                   </button>

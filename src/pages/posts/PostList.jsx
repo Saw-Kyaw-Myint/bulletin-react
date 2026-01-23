@@ -21,6 +21,7 @@ import { deletePosts, postList } from "../../hooks/usePost";
 import { PostStatus } from "../../constants/commons";
 import { dateFormat } from "../../utils/date";
 import { truncateText } from "../../lib/common";
+import { POST } from "../../constants/routes";
 
 export default function PostList() {
   const statusOptions = [
@@ -94,10 +95,6 @@ export default function PostList() {
     }
     setSelectedRows(newSelectedRows);
     setSelectAll(newSelectedRows.size === posts.length);
-  };
-
-  const handleCreate = () => {
-    console.log("Create new post");
   };
 
   const handleUpload = (e) => {
@@ -176,7 +173,6 @@ export default function PostList() {
                   />
 
                   {/* Post Description */}
-                  {/* Name */}
                   <FormInput
                     label="Description"
                     type="text"
@@ -218,8 +214,8 @@ export default function PostList() {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex space-x-2">
                     <button
-                      onClick={handleCreate}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                      onClick={() => navigate(`/post/create`)}
+                      className="px-4 py-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
                     >
                       <Plus size={16} />
                       <span>Create</span>
@@ -333,7 +329,10 @@ export default function PostList() {
                         {truncateText(post?.title, 25)}
                       </td>
 
-                      <td className="px-6 py-4 text-purple-200 hover:underline cursor-pointer">
+                      <td
+                        className="px-6 py-4 text-purple-200 hover:underline cursor-pointer"
+                        onClick={() => navigate(`/post/${post.id}`)}
+                      >
                         {truncateText(post.description)}
                       </td>
 
@@ -354,7 +353,10 @@ export default function PostList() {
                       </td>
 
                       <td className="px-6 py-4">
-                        <button className="p-2 cursor-pointer text-purple-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                        <button
+                          onClick={() => navigate(`${POST.EDIT}/${post.id}`)}
+                          className="p-2 cursor-pointer text-purple-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                        >
                           <Edit size={16} />
                         </button>
                       </td>
