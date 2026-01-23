@@ -25,3 +25,8 @@ export const deletePostsApi = async (payload) => {
   const response = await client.post(POST.MULTIPLE_DELETE, payload);
   return response.data;
 };
+
+export const exportCSV = async (payload) => {
+  const response = await client.post(POST.EXPORT_CSV, payload);
+  return response.data;
+};

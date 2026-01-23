@@ -22,6 +22,7 @@ import { PostStatus } from "../../constants/commons";
 import { dateFormat } from "../../utils/date";
 import { truncateText } from "../../lib/common";
 import { POST } from "../../constants/routes";
+import { exportCSV } from "../../api/post";
 
 export default function PostList() {
   const statusOptions = [
@@ -116,8 +117,35 @@ export default function PostList() {
     }
   };
 
-  const handleDownload = () => {
-    console.log("Download posts");
+  const handleDownload = async () => {
+    try {
+      const fileName = window.prompt("Enter file name for CSV", "posts");
+
+      if (!fileName) {
+        return;
+      }
+      const payload = { post_ids: Array.from(selectedRows) };
+      if (Array.from(selectedRows).length) {
+        const response = await exportCSV(payload);
+
+        const blob = new Blob([response], {
+          type: "text/csv;charset=utf-8;",
+        });
+
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${fileName}.csv`;
+        document.body.appendChild(a);
+        a.click();
+
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleDelete = () => {
@@ -241,7 +269,7 @@ export default function PostList() {
                         selectedRows.size === 0
                           ? "bg-green-600/50 cursor-not-allowed"
                           : "bg-green-600 hover:bg-green-700"
-                      } text-white rounded-lg transition-colors duration-200 flex items-center space-x-2`}
+                      } text-white cursor-pointer rounded-lg transition-colors duration-200 flex items-center space-x-2`}
                     >
                       <Download size={16} />
                       <span>Download</span>
