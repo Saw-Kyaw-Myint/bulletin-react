@@ -45,12 +45,14 @@ const UsersList = () => {
 
   const [selectAll, setSelectAll] = useState(false);
   const [selectedRows, setSelectedRows] = useState(new Set());
+  const [excludeRows, setExcludeRows] = useState(new Set());
   const [openSettings, setOpenSettings] = useState(null);
   const [showConfirmUnlock, setShowConfirmUnlock] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [params, setParams] = useState(null);
+  const { data: usersData, isLoading } = userList({ page, ...params });
 
   const handleSearchChange = (e) => {
     const { name, value } = e.target;
@@ -73,26 +75,49 @@ const UsersList = () => {
     e.preventDefault();
     setParams(searchForm);
   };
+  const isSelectAllChecked = React.useMemo(() => {
+    if (!selectAll || !usersData?.data) return false;
+    // return posts.data.every((post) => !excludeRows.has(post.id));
+    return excludeRows.size < 1;
+  }, [selectAll, excludeRows, usersData?.data]);
 
-  const handleSelectAll = () => {
-    const newSelectAll = !selectAll;
+  const handleSelectAll = (event) => {
+    event.stopPropagation();
+    const newSelectAll = !isSelectAllChecked;
     setSelectAll(newSelectAll);
-    const newSelectedRows = new Set();
+
     if (newSelectAll) {
-      usersData.data.forEach((user) => newSelectedRows.add(user.id));
+      setSelectedRows(new Set());
+      setExcludeRows(new Set());
+    } else {
+      setSelectedRows(new Set());
+      setExcludeRows(new Set());
     }
-    setSelectedRows(newSelectedRows);
   };
 
   const handleRowSelect = (userId) => {
-    const newSelectedRows = new Set(selectedRows);
-    if (newSelectedRows.has(userId)) {
-      newSelectedRows.delete(userId);
+    if (selectAll) {
+      const newExclude = new Set(excludeRows);
+      if (newExclude.has(userId)) {
+        newExclude.delete(userId);
+      } else {
+        newExclude.add(userId);
+      }
+      setExcludeRows(newExclude);
     } else {
-      newSelectedRows.add(userId);
+      const newSelectedRows = new Set(selectedRows);
+      if (newSelectedRows.has(userId)) {
+        newSelectedRows.delete(userId);
+      } else {
+        newSelectedRows.add(userId);
+      }
+      setSelectedRows(newSelectedRows);
     }
-    setSelectedRows(newSelectedRows);
-    setSelectAll(newSelectedRows.size === usersData.data.length);
+  };
+
+  const isRowSelected = (userId) => {
+    if (selectAll) return !excludeRows.has(userId);
+    return selectedRows.has(userId);
   };
 
   const handleLockUnlock = () => {
@@ -106,7 +131,7 @@ const UsersList = () => {
   };
 
   const handleDelete = () => {
-    if (selectedRows.size > 0) {
+    if (selectedRows.size > 0 || selectAll) {
       setShowConfirmDelete(true);
     }
   };
@@ -129,14 +154,13 @@ const UsersList = () => {
     setOpenSettings(null);
   };
 
-  const { data: usersData, isLoading } = userList({ page, ...params });
   const { mutate: lockUserFn, isLoading: isLockUserLoading } = lockUser();
   const { mutate: unLockUserFn, isLoading: isUnlockUserLoading } = unlockUser();
   const { mutate: deleteUserFn, isLoading: isDeleteUserLoading } =
     deleteUsers();
 
   const isLockFunction = usersData?.data.some(
-    (user) => selectedRows.has(user.id) && user.lock_flg === false,
+    (user) => selectedRows.has(user.id) && user.lock_flg == true,
   );
 
   const resetSelectedRows = () => {
@@ -145,7 +169,12 @@ const UsersList = () => {
   };
 
   const confirmUnlock = async () => {
-    if (isLockFunction) {
+    if (selectedRows.size > 10) {
+      alert("Please Select 10 Users.");
+      setShowConfirmUnlock(false);
+      return;
+    }
+    if (!isLockFunction) {
       try {
         const payload = { user_ids: Array.from(selectedRows) };
         await lockUserFn(payload);
@@ -167,9 +196,14 @@ const UsersList = () => {
 
   const confirmDelete = async () => {
     try {
-      const payload = { user_ids: Array.from(selectedRows) };
+      const payload = selectAll
+        ? { all: true, exclude_ids: Array.from(excludeRows) }
+        : { post_ids: Array.from(selectedRows) };
+
+      console.log("payload", payload);
       await deleteUserFn(payload);
       resetSelectedRows();
+      setSelectAll(false);
     } catch (error) {
       console.error(error);
     }
@@ -283,12 +317,12 @@ const UsersList = () => {
                         {isLockFunction ? (
                           <>
                             <Lock size={16} />
-                            <span>Lock</span>
+                            <span>UnLock</span>
                           </>
                         ) : (
                           <>
                             <Unlock size={16} />
-                            <span>Unlock</span>
+                            <span>Lock</span>
                           </>
                         )}
                       </button>
@@ -296,10 +330,11 @@ const UsersList = () => {
                       <button
                         onClick={handleDelete}
                         disabled={
-                          selectedRows.size === 0 || isDeleteUserLoading
+                          (selectedRows.size === 0 && !selectAll) ||
+                          isDeleteUserLoading
                         }
                         className={`px-4 py-2 ${
-                          selectedRows.size === 0
+                          selectedRows.size === 0 && !selectAll
                             ? "bg-red-600/50 cursor-not-allowed"
                             : "bg-red-600 hover:bg-red-700"
                         } text-white cursor-pointer rounded-lg transition-colors duration-200 flex items-center space-x-2 disabled:cursor-not-allowed`}
@@ -342,7 +377,7 @@ const UsersList = () => {
                 <DataTable
                   headers={userTableHeaders}
                   data={usersData.data}
-                  selectAll={selectAll}
+                  selectAll={isSelectAllChecked}
                   onSelectAll={handleSelectAll}
                   emptyState={
                     <div className="text-center py-12">
@@ -354,7 +389,7 @@ const UsersList = () => {
                       <td className="px-6 py-4">
                         <input
                           type="checkbox"
-                          checked={selectedRows.has(user.id)}
+                          checked={isRowSelected(user.id)}
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) => handleRowSelect(user.id)}
                           className="w-4 h-4 text-purple-600 ml-4 bg-white/10 border-white/30 rounded"
@@ -454,7 +489,7 @@ const UsersList = () => {
         open={showConfirmUnlock}
         title="Confirm Lock/Unlock"
         description={`Are you sure you want to
-                  ${isLockFunction ? "lock" : "unlock"}
+                  ${isLockFunction ? "unlock" : "lock"}
                   ${selectedRows.size} selected
                   ${
                     selectedRows.size !== 1 ? "users?" : "user?"
@@ -462,7 +497,7 @@ const UsersList = () => {
                   undone.`}
         onCancel={cancelUnlock}
         onConfirm={confirmUnlock}
-        confirmText={isLockFunction ? "Lock" : "Unlock"}
+        confirmText={isLockFunction ? "Unlock" : "Lock"}
         cancelText="Cancel"
       />
 
