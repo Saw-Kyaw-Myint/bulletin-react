@@ -13,7 +13,7 @@ const PostCreate = () => {
     };
     mutation.mutate(payload, {
       onSuccess: (res) => {
-        alert(res.message);
+        alert(res.msg);
         setIsSuccess(true);
       },
       onError: (err) => {

@@ -17,7 +17,7 @@ const PostEdit = () => {
     };
     mutation.mutate(payload, {
       onSuccess: (res) => {
-        alert(res.message);
+        alert(res.msg);
       },
       onError: (err) => {
         setError(err.response?.data?.errors);

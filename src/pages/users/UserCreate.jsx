@@ -70,6 +70,7 @@ const UserCreate = () => {
       profile: null,
     });
     setPreviewImage(null);
+    setErrorMessage(null);
   };
 
   const mutation = createUser();
@@ -92,7 +93,7 @@ const UserCreate = () => {
 
     mutation.mutate(data, {
       onSuccess: (res) => {
-        alert(res?.message);
+        alert(res?.msg);
         handleReset();
       },
       onError: (error) => {
