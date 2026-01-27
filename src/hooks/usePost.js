@@ -32,7 +32,7 @@ export const createPost = () => {
   return useMutation({
     mutationFn: createPostApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts", id] });
+      queryClient.invalidateQueries({ queryKey: ["post"] });
     },
     onError: (errors) => {
       console.error("create Post api", errors);

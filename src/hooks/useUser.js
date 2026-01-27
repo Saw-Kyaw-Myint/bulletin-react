@@ -47,6 +47,7 @@ export const updateUser = (id) => {
     mutationFn: (formData) => userUpdateApi(formData, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["user", id] });
     },
     onError: (error) => {
       console.error(error);

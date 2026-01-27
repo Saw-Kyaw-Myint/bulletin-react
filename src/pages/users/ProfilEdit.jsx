@@ -6,6 +6,7 @@ import { getUser, updateUser } from "../../hooks/useUser";
 import { formatDateToISO } from "../../utils/date";
 import useAuthStore from "../../store/useAuthStore";
 import UserEditForm from "../../components/Form/UserEditForm";
+import { RoleText } from "../../constants/commons";
 
 const ProfileEdit = () => {
   const { user } = useAuthStore();
@@ -37,15 +38,18 @@ const ProfileEdit = () => {
         email: data.email || "",
         password: "",
         confirm_password: "",
-        role: Number(data.role) ? 1 : 0,
+        role: Number(data.role) ? RoleText.Admin : RoleText.User,
         phone: data.phone || "",
         dob: data.dob ? formatDateToISO(data.dob) : "",
         address: data.address || "",
         profile: null,
       });
-      setPreviewImage(
-        `${import.meta.env.VITE_API_URL}/images/${data?.profile_path}` || null,
-      );
+      if (data.profile_path) {
+        setPreviewImage(
+          `${import.meta.env.VITE_API_URL}/images/${data?.profile_path}` ||
+            null,
+        );
+      }
     }
   }, [data]);
 
@@ -73,13 +77,23 @@ const ProfileEdit = () => {
         email: data.email || "",
         password: "",
         confirm_password: "",
-        role: data.role ? 1 : 0 == 0 ? 0 : "",
+        role: data.role
+          ? RoleText.User
+          : RoleText.User == 0
+            ? RoleText.User
+            : "",
         phone: data.phone || "",
         dob: data.dob || "",
         address: data.address || "",
         profile: null,
       });
-      setPreviewImage(data.profile || null);
+      if (!!data.profile_path) {
+        setPreviewImage(
+          `${import.meta.env.VITE_API_URL}/images/${data?.profile_path}`,
+        );
+      } else {
+        setPreviewImage(null);
+      }
       setErrorMessage({});
     }
   };
@@ -94,6 +108,12 @@ const ProfileEdit = () => {
       }
       form.append("confirm_password", formData.confirm_password ?? "");
     });
+
+    if (formData.profile) {
+      form.append("profile", formData.profile);
+    } else if (!previewImage) {
+      form.append("profile", "");
+    }
 
     mutation.mutate(form, {
       onSuccess: (res) => {
@@ -126,6 +146,11 @@ const ProfileEdit = () => {
             handleFileChange={handleFileChange}
             handleSubmit={handleSubmit}
             handleReset={handleReset}
+            resetPreviewImage={(e) => {
+              e.stopPropagation();
+              setPreviewImage(null);
+              setFormData({ ...formData, profile: null });
+            }}
             previewImage={previewImage}
             errorMessage={errorMessage}
           />

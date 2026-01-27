@@ -48,6 +48,7 @@ export default function PostList() {
   });
   const [selectAll, setSelectAll] = useState(false);
   const [selectedRows, setSelectedRows] = useState(new Set());
+  const [excludeRows, setExcludeRows] = useState(new Set());
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [page, setPage] = useState(1);
   const [params, setParams] = useState(null);
@@ -76,26 +77,29 @@ export default function PostList() {
     setParams(searchForm);
   };
 
-  const handleSelectAll = (event) => {
-    event.stopPropagation();
-    const newSelectAll = !selectAll;
-    setSelectAll(newSelectAll);
-    const newSelectedRows = new Set();
-    if (newSelectAll) {
-      posts.data.forEach((post) => newSelectedRows.add(post.id));
+  const handleRowSelect = (postId) => {
+    if (selectAll) {
+      const newExclude = new Set(excludeRows);
+      if (newExclude.has(postId)) {
+        newExclude.delete(postId);
+      } else {
+        newExclude.add(postId);
+      }
+      setExcludeRows(newExclude);
+    } else {
+      const newSelected = new Set(selectedRows);
+      if (newSelected.has(postId)) {
+        newSelected.delete(postId);
+      } else {
+        newSelected.add(postId);
+      }
+      setSelectedRows(newSelected);
     }
-    setSelectedRows(newSelectedRows);
   };
 
-  const handleRowSelect = (postId) => {
-    const newSelectedRows = new Set(selectedRows);
-    if (newSelectedRows.has(postId)) {
-      newSelectedRows.delete(postId);
-    } else {
-      newSelectedRows.add(postId);
-    }
-    setSelectedRows(newSelectedRows);
-    setSelectAll(newSelectedRows.size === posts.length);
+  const isRowSelected = (postId) => {
+    if (selectAll) return !excludeRows.has(postId);
+    return selectedRows.has(postId);
   };
 
   const handleUpload = (e) => {
@@ -149,16 +153,16 @@ export default function PostList() {
   };
 
   const handleDelete = () => {
-    console.log("v", selectedRows.size);
-    if (selectedRows.size > 0) {
+    if (selectedRows.size > 0 || selectAll) {
       setShowConfirmDelete(true);
     }
   };
 
   const confirmDelete = async () => {
-    console.log("Deleting selected posts:", Array.from(selectedRows));
     try {
-      const payload = { post_ids: Array.from(selectedRows) };
+      const payload = selectAll
+        ? { all: true, exclude_ids: Array.from(excludeRows) }
+        : { post_ids: Array.from(selectedRows) };
       await deleteUserFn(payload);
       setSelectedRows(new Set());
       setSelectAll(false);
@@ -174,6 +178,26 @@ export default function PostList() {
   };
 
   const { data: posts, isLoading } = postList({ page, ...params });
+
+  const isSelectAllChecked = React.useMemo(() => {
+    if (!selectAll || !posts?.data) return false;
+    // return posts.data.every((post) => !excludeRows.has(post.id));
+    return excludeRows.size < 1;
+  }, [selectAll, excludeRows, posts?.data]);
+
+  const handleSelectAll = (event) => {
+    event.stopPropagation();
+    const newSelectAll = !isSelectAllChecked;
+    setSelectAll(newSelectAll);
+
+    if (newSelectAll) {
+      setSelectedRows(new Set());
+      setExcludeRows(new Set());
+    } else {
+      setSelectedRows(new Set());
+      setExcludeRows(new Set());
+    }
+  };
 
   return (
     <Layout activeRoute="post-list">
@@ -264,7 +288,7 @@ export default function PostList() {
                     {/* Download Button - Disabled if no rows selected */}
                     <button
                       onClick={handleDownload}
-                      disabled={selectedRows.size === 0}
+                      disabled={selectedRows.size == 0}
                       className={`px-4 py-2 ${
                         selectedRows.size === 0
                           ? "bg-green-600/50 cursor-not-allowed"
@@ -278,9 +302,9 @@ export default function PostList() {
                     {/* Delete Button - Disabled if no rows selected */}
                     <button
                       onClick={handleDelete}
-                      disabled={selectedRows.size === 0}
+                      disabled={selectedRows.size == 0 && !selectAll}
                       className={`px-4 py-2 ${
-                        selectedRows.size === 0
+                        selectedRows.size == 0 && !selectAll
                           ? "bg-red-600/50 cursor-not-allowed"
                           : "bg-red-600 hover:bg-red-700 cursor-pointer "
                       } text-white  rounded-lg transition-colors duration-200 flex items-center space-x-2`}
@@ -319,7 +343,7 @@ export default function PostList() {
               <DataTable
                 headers={postTableHeaders}
                 data={posts?.data}
-                selectAll={selectAll}
+                selectAll={isSelectAllChecked}
                 onSelectAll={handleSelectAll}
                 emptyState={
                   <div className="text-center py-12">
@@ -336,7 +360,7 @@ export default function PostList() {
                       <td className="px-6 py-4">
                         <input
                           type="checkbox"
-                          checked={selectedRows.has(post.id)}
+                          checked={isRowSelected(post.id)}
                           onClick={(e) => e.stopPropagation()}
                           onChange={() => handleRowSelect(post.id)}
                           className="w-4 h-4 text-purple-600 cursor-pointer ml-2.5 bg-white/10 border-white/30 rounded focus:ring-purple-500 focus:ring-2"

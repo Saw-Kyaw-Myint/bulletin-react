@@ -6,6 +6,7 @@ const PostForm = ({
   mode = "create", // "create" | "edit"
   initialValues,
   onSubmit,
+  isSuccess,
   loading = false,
   submitText = "Save",
 }) => {
@@ -43,6 +44,12 @@ const PostForm = ({
     e.preventDefault();
     onSubmit(formData, setErrorMessage);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      handleReset();
+    }
+  }, [isSuccess]);
 
   const handleStatusToggle = () => {
     setFormData((prev) => ({

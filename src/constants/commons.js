@@ -1,18 +1,28 @@
 export const Role = {
-  true: "User",
-  false: "Admin",
+  1: "User",
+  0: "Admin",
+};
+
+export const RoleText = {
+  User: 1,
+  Admin: 0,
 };
 
 export const imagePath = `${import.meta.env.VITE_API_URL}/images`;
 
 export const userRolesOptions = [
-  { value: 0, label: "admin" },
+  { value: 0, label: "Admin" },
   { value: 1, label: "User" },
 ];
 
-export const userStatus = {
-  true: "Lock",
-  false: "Unlock",
+export const UserStatus = {
+  1: "Lock",
+  0: "Unlock",
+};
+
+export const UserStatusText = {
+  Lock: 1,
+  Unlock: 0,
 };
 
 export const TOKEN = {
@@ -23,4 +33,9 @@ export const TOKEN = {
 export const PostStatus = {
   0: "inactive",
   1: "active",
+};
+
+export const PostStatusText = {
+  Inactive: 0,
+  Active: 1,
 };

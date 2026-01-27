@@ -10,6 +10,9 @@ import {
   RefreshCw,
   Settings,
   UserPlus,
+  CropIcon,
+  XCircleIcon,
+  X,
 } from "lucide-react";
 
 import ErrorMessage from "../ErrorMessage";
@@ -26,6 +29,7 @@ const UserEditForm = ({
   handleReset,
   previewImage,
   errorMessage,
+  resetPreviewImage,
 }) => {
   return (
     <form
@@ -58,15 +62,29 @@ const UserEditForm = ({
             className="cursor-pointer w-32 h-32 rounded-full overflow-hidden border-3 border-white/30 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors"
           >
             {previewImage ? (
-              <img
-                src={previewImage}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
+              <>
+                <img
+                  src={previewImage}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </>
             ) : (
               <Image size={32} className="text-purple-300" />
             )}
           </label>
+          {previewImage && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                resetPreviewImage(e);
+              }}
+              className="absolute top-1 right-1 cursor-pointer bg-black/50 text-white rounded-full p-1 hover:bg-black/70 transition"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
         <ErrorMessage message={errorMessage?.profile} />
       </div>

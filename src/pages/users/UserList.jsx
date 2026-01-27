@@ -15,7 +15,7 @@ import {
   unlockUser,
   userList,
 } from "../../hooks/useUser";
-import { Role, userStatus } from "../../constants/commons";
+import { Role, UserStatus } from "../../constants/commons";
 import { dateFormat } from "../../utils/date";
 
 const UsersList = () => {
@@ -391,12 +391,12 @@ const UsersList = () => {
                       <td className="px-6 py-4">
                         <span
                           className={`px-2 py-1 rounded-full text-xs ${
-                            user.lock_flg === true
+                            user.lock_flg
                               ? "bg-green-500/30 text-green-300"
                               : "bg-red-500/30 text-red-300"
                           }`}
                         >
-                          {userStatus[user.lock_flg]}
+                          {UserStatus[user.lock_flg]}
                         </span>
                       </td>
 

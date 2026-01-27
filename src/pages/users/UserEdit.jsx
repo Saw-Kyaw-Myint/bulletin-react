@@ -19,7 +19,7 @@ import Loading from "../../components/Loading";
 import FormSelect from "../../components/Form/FormSelect";
 import ErrorMessage from "../../components/ErrorMessage";
 
-import { userRolesOptions } from "../../constants/commons";
+import { Role, RoleText, userRolesOptions } from "../../constants/commons";
 import { getUser, updateUser } from "../../hooks/useUser";
 import { dateFormat, formatDateToISO } from "../../utils/date";
 import useAuthStore from "../../store/useAuthStore";
@@ -56,15 +56,18 @@ const UserEdit = () => {
         email: data.email || "",
         password: "",
         confirm_password: "",
-        role: Number(data.role) || 1,
+        role: Number(data.role) ? RoleText.Admin : RoleText.User,
         phone: data.phone || "",
         dob: data.dob ? formatDateToISO(data.dob) : "",
         address: data.address || "",
         profile: null,
       });
-      setPreviewImage(
-        `${import.meta.env.VITE_API_URL}/images/${data?.profile_path}` || null,
-      );
+      if (data.profile_path) {
+        setPreviewImage(
+          `${import.meta.env.VITE_API_URL}/images/${data?.profile_path}` ||
+            null,
+        );
+      }
     }
   }, [data]);
 
@@ -92,20 +95,29 @@ const UserEdit = () => {
         email: data.email || "",
         password: "",
         confirm_password: "",
-        role: data.role || 1,
+        role: data.role
+          ? RoleText.User
+          : RoleText.User == 0
+            ? RoleText.User
+            : "",
         phone: data.phone || "",
         dob: data.dob || "",
         address: data.address || "",
         profile: null,
       });
-      setPreviewImage(data.profile || null);
+      if (!!data.profile_path) {
+        setPreviewImage(
+          `${import.meta.env.VITE_API_URL}/images/${data?.profile_path}`,
+        );
+      } else {
+        setPreviewImage(null);
+      }
       setErrorMessage({});
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const form = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (value !== null && value !== undefined && value !== "") {
@@ -114,8 +126,15 @@ const UserEdit = () => {
       form.append("confirm_password", formData.confirm_password ?? "");
     });
 
+    if (formData.profile) {
+      form.append("profile", formData.profile);
+    } else if (!previewImage) {
+      form.append("profile", "");
+    }
+
     mutation.mutate(form, {
       onSuccess: (res) => {
+        handleReset();
         alert(res?.message || "User updated successfully");
       },
       onError: (err) => {
@@ -141,6 +160,11 @@ const UserEdit = () => {
             handleFileChange={handleFileChange}
             handleSubmit={handleSubmit}
             handleReset={handleReset}
+            resetPreviewImage={(e) => {
+              e.stopPropagation();
+              setPreviewImage(null);
+              setFormData({ ...formData, profile: null });
+            }}
             previewImage={previewImage}
             errorMessage={errorMessage}
           />

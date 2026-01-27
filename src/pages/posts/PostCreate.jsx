@@ -1,8 +1,10 @@
 import Layout from "../../components/Layout";
 import { createPost } from "../../hooks/usePost";
 import PostForm from "../../components/Form/PostForm";
+import { useState } from "react";
 
 const PostCreate = () => {
+  const [isSuccess, setIsSuccess] = useState(false);
   const mutation = createPost();
   const handleSubmit = (formData, setError) => {
     const payload = {
@@ -12,8 +14,10 @@ const PostCreate = () => {
     mutation.mutate(payload, {
       onSuccess: (res) => {
         alert(res.message);
+        setIsSuccess(true);
       },
       onError: (err) => {
+        setIsSuccess(false);
         setError(err.response?.data?.errors);
       },
     });
@@ -26,6 +30,7 @@ const PostCreate = () => {
           <PostForm
             onSubmit={handleSubmit}
             submitText="Create"
+            isSuccess={isSuccess}
             loading={mutation.isLoading}
           />
         </div>
