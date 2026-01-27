@@ -128,8 +128,10 @@ export default function PostList() {
       if (!fileName) {
         return;
       }
-      const payload = { post_ids: Array.from(selectedRows) };
-      if (Array.from(selectedRows).length) {
+      if (Array.from(selectedRows).length || selectAll) {
+        const payload = selectAll
+          ? { all: true, exclude_ids: Array.from(excludeRows) }
+          : { post_ids: Array.from(selectedRows) };
         const response = await exportCSV(payload);
 
         const blob = new Blob([response], {
@@ -288,9 +290,9 @@ export default function PostList() {
                     {/* Download Button - Disabled if no rows selected */}
                     <button
                       onClick={handleDownload}
-                      disabled={selectedRows.size == 0}
+                      disabled={selectedRows.size == 0 && !selectAll}
                       className={`px-4 py-2 ${
-                        selectedRows.size === 0
+                        selectedRows.size == 0 && !selectAll
                           ? "bg-green-600/50 cursor-not-allowed"
                           : "bg-green-600 hover:bg-green-700"
                       } text-white cursor-pointer rounded-lg transition-colors duration-200 flex items-center space-x-2`}
