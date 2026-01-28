@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
   FileText,
   Edit,
@@ -7,6 +8,12 @@ import {
   Download,
   Trash2,
   AlertTriangle,
+  FileSpreadsheet,
+  CheckCircle,
+  XCircle,
+  EyeOff,
+  Eye,
+  X,
 } from "lucide-react";
 import Layout from "../../components/Layout";
 import DatePicker from "../../components/DatePicker";
@@ -17,12 +24,18 @@ import SearchActionButtons from "../../components/SearchActionButton";
 import ConfirmModal from "../../components/ConfirmModel";
 import DataTable from "../../components/DataTable";
 import Loading from "../../components/Loading";
-import { deletePosts, postList } from "../../hooks/usePost";
+import {
+  csvProgress,
+  deletePosts,
+  importCsv,
+  postList,
+} from "../../hooks/usePost";
 import { PostStatus } from "../../constants/commons";
 import { dateFormat } from "../../utils/date";
 import { truncateText } from "../../lib/common";
 import { POST } from "../../constants/routes";
 import { exportCSV } from "../../api/post";
+import UploadToast from "../../components/UploadToast";
 
 export default function PostList() {
   const statusOptions = [
@@ -52,8 +65,13 @@ export default function PostList() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [page, setPage] = useState(1);
   const [params, setParams] = useState(null);
+  const [taskId, setTaskId] = useState(null);
+  // const [uploadProgress, setUploadProgress] = useState(90);
+  const [uploadStatus, setUploadStatus] = useState("uploading");
+  const [uploadMessage, setUploadMessage] = useState("");
 
   const navigate = useNavigate();
+  const mutation = importCsv();
   const { mutate: deleteUserFn, isLoading: isDeleteUserLoading } =
     deletePosts();
 
@@ -111,8 +129,19 @@ export default function PostList() {
         file.type !==
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       ) {
-        console.log("Uploaded file:", file.name);
-        // Process the file here
+        const data = new FormData();
+        data.append("file", file);
+
+        mutation.mutate(data, {
+          onSuccess: (res) => {
+            alert(res?.msg);
+            setTaskId(res?.task_id ?? 0);
+          },
+          onError: (error) => {
+            console.error("CSV Import Fail.", error);
+            // setErrorMessage(error.response.errors || "Csv Import Fail.");
+          },
+        });
       } else {
         alert(
           "Excel files are not allowed. Please upload a different file format.",
@@ -180,6 +209,9 @@ export default function PostList() {
   };
 
   const { data: posts, isLoading } = postList({ page, ...params });
+  const { data: uploadProgress } = csvProgress(taskId);
+
+  const finishUpload = (uploadProgress?.progress ?? 0) >= 100;
 
   const isSelectAllChecked = React.useMemo(() => {
     if (!selectAll || !posts?.data) return false;
@@ -281,7 +313,7 @@ export default function PostList() {
                       <span>Upload</span>
                       <input
                         type="file"
-                        accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.zip,.rar"
+                        accept=".csv"
                         onChange={handleUpload}
                         className="hidden"
                       />
@@ -437,6 +469,14 @@ export default function PostList() {
         confirmText="Delete"
         cancelText="Cancel"
       />
+
+      {taskId && (
+        <UploadToast
+          uploadProgress={uploadProgress}
+          finishUpload={finishUpload}
+          setTaskId={setTaskId}
+        />
+      )}
     </Layout>
   );
 }

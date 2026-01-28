@@ -3,9 +3,12 @@ import {
   createPostApi,
   deletePostsApi,
   getPostApi,
+  importCSV,
+  csvProgressApi,
   postListApi,
   updatePostApi,
 } from "../api/post";
+import { useEffect } from "react";
 
 export const postList = (params) => {
   return useQuery({
@@ -66,4 +69,47 @@ export const deletePosts = () => {
       console.error("Delete Post api", errors);
     },
   });
+};
+
+export const importCsv = () => {
+  return useMutation({
+    mutationFn: importCSV,
+    onSuccess: () => {
+      console.log("success import csv");
+    },
+    onError: (errors) => {
+      console.error("Import csv api", errors);
+    },
+  });
+};
+
+export const csvProgress = (task_id) => {
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
+    queryKey: ["csvProgress", task_id],
+    queryFn: () => csvProgressApi(task_id),
+    enabled: !!task_id,
+    refetchInterval: (query) => {
+      const progress = Number(query.state.data?.progress || 0);
+      return progress >= 100 ? false : 1000;
+    },
+    onError: (error) => {
+      console.error("CSV progress error:", error);
+    },
+  });
+
+  // Watch the `data` to handle progress
+  useEffect(() => {
+    if (query.data) {
+      console.log("Current progress:", query.data.progress);
+
+      if (query.data.progress >= 100) {
+        console.log("CSV import finished!");
+        queryClient.invalidateQueries({ queryKey: ["posts"] });
+      }
+    }
+  }, [query.data, queryClient]);
+
+  return query;
 };

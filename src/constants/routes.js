@@ -21,5 +21,7 @@ export const POST = {
   UPDATE: "posts/update",
   EDIT: "/post/edit",
   MULTIPLE_DELETE: "/posts/multiple-delete",
+  IMPORT_CSV: "/posts/import/csv",
+  CSV_PROGRESS: "/posts/csv-progress",
   EXPORT_CSV: "/posts/export/csv",
 };

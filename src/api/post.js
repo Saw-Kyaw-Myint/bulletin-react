@@ -26,6 +26,18 @@ export const deletePostsApi = async (payload) => {
   return response.data;
 };
 
+export const importCSV = async (payload) => {
+  const response = await client.post(POST.IMPORT_CSV, payload, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+export const csvProgressApi = async (task_id) => {
+  const response = await client.get(`${POST.CSV_PROGRESS}/${task_id}`);
+  return response.data;
+};
+
 export const exportCSV = async (payload) => {
   const response = await client.post(POST.EXPORT_CSV, payload);
   return response.data;
