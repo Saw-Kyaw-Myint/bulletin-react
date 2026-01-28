@@ -1,20 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  FileText,
-  Edit,
-  Plus,
-  Upload,
-  Download,
-  Trash2,
-  AlertTriangle,
-  FileSpreadsheet,
-  CheckCircle,
-  XCircle,
-  EyeOff,
-  Eye,
-  X,
-} from "lucide-react";
+import { FileText, Edit, Plus, Upload, Download, Trash2 } from "lucide-react";
 import Layout from "../../components/Layout";
 import DatePicker from "../../components/DatePicker";
 import { useNavigate } from "react-router-dom";
@@ -66,9 +52,7 @@ export default function PostList() {
   const [page, setPage] = useState(1);
   const [params, setParams] = useState(null);
   const [taskId, setTaskId] = useState(null);
-  // const [uploadProgress, setUploadProgress] = useState(90);
-  const [uploadStatus, setUploadStatus] = useState("uploading");
-  const [uploadMessage, setUploadMessage] = useState("");
+  const fileInputRef = useRef(null);
 
   const navigate = useNavigate();
   const mutation = importCsv();
@@ -140,6 +124,11 @@ export default function PostList() {
           onError: (error) => {
             console.error("CSV Import Fail.", error);
             // setErrorMessage(error.response.errors || "Csv Import Fail.");
+          },
+          onSettled: () => {
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
           },
         });
       } else {
@@ -314,6 +303,7 @@ export default function PostList() {
                       <input
                         type="file"
                         accept=".csv"
+                        ref={fileInputRef}
                         onChange={handleUpload}
                         className="hidden"
                       />

@@ -75,10 +75,10 @@ export const importCsv = () => {
   return useMutation({
     mutationFn: importCSV,
     onSuccess: () => {
-      console.log("success import csv");
+      console.log("Success csv import.");
     },
     onError: (errors) => {
-      console.error("Import csv api", errors);
+      console.error("Import csv api.", errors);
     },
   });
 };
