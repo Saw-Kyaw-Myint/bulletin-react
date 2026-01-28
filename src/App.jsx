@@ -23,8 +23,8 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/posts" element={<PostList />} />
       <Route element={<ProtectedRoute />}>
-        <Route path="/posts" element={<PostList />} />
         <Route path="/post/create" element={<PostCreate />} />
         <Route path="/post/:id" element={<PostDetail />} />
         <Route path="/post/edit/:id" element={<PostEdit />} />

@@ -22,6 +22,7 @@ import { truncateText } from "../../lib/common";
 import { POST } from "../../constants/routes";
 import { exportCSV } from "../../api/post";
 import UploadToast from "../../components/UploadToast";
+import useAuthStore from "../../store/useAuthStore";
 
 export default function PostList() {
   const statusOptions = [
@@ -36,7 +37,7 @@ export default function PostList() {
     "Description",
     "Status",
     "Post Date",
-    "Edit",
+    ...(useAuthStore.getState()?.user ? ["Edit"] : []),
   ];
 
   const [searchForm, setSearchForm] = useState({
@@ -232,82 +233,88 @@ export default function PostList() {
           ) : (
             <>
               {/* Search Form */}
-              <form
-                onSubmit={handleSearchSubmit}
-                className="relative z-10  bg-white/10 backdrop-blur-lg rounded-xl p-6 mb-6 border border-white/20"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-                  {/* Post Name */}
-                  <FormInput
-                    label="Post Name"
-                    type="text"
-                    name="name"
-                    value={searchForm.name}
-                    onChange={handleSearchChange}
-                    placeholder="Enter post name"
-                  />
-
-                  {/* Post Description */}
-                  <FormInput
-                    label="Description"
-                    type="text"
-                    name="description"
-                    value={searchForm.description}
-                    onChange={handleSearchChange}
-                    placeholder="Enter description"
-                  />
-
-                  {/* Post Status */}
-                  <FormSelect
-                    label="Status"
-                    name="status"
-                    value={searchForm.status}
-                    onChange={handleSearchChange}
-                    options={statusOptions}
-                  />
-
-                  {/* Post Date */}
-                  <div>
-                    <label className="block text-white text-sm font-medium mb-2">
-                      Post Date
-                    </label>
-                    <DatePicker
-                      name="date"
-                      value={searchForm.date}
+              {useAuthStore.getState()?.user && (
+                <form
+                  onSubmit={handleSearchSubmit}
+                  className="relative z-10  bg-white/10 backdrop-blur-lg rounded-xl p-6 mb-6 border border-white/20"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                    {/* Post Name */}
+                    <FormInput
+                      label="Post Name"
+                      type="text"
+                      name="name"
+                      value={searchForm.name}
                       onChange={handleSearchChange}
-                      placeholder="Select date"
+                      placeholder="Enter post name"
                     />
-                  </div>
 
-                  {/* Action Buttons */}
-                  <SearchActionButtons onReset={handleSearchReset} />
-                </div>
-              </form>
+                    {/* Post Description */}
+                    <FormInput
+                      label="Description"
+                      type="text"
+                      name="description"
+                      value={searchForm.description}
+                      onChange={handleSearchChange}
+                      placeholder="Enter description"
+                    />
+
+                    {/* Post Status */}
+                    <FormSelect
+                      label="Status"
+                      name="status"
+                      value={searchForm.status}
+                      onChange={handleSearchChange}
+                      options={statusOptions}
+                    />
+
+                    {/* Post Date */}
+                    <div>
+                      <label className="block text-white text-sm font-medium mb-2">
+                        Post Date
+                      </label>
+                      <DatePicker
+                        name="date"
+                        value={searchForm.date}
+                        onChange={handleSearchChange}
+                        placeholder="Select date"
+                      />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <SearchActionButtons onReset={handleSearchReset} />
+                  </div>
+                </form>
+              )}
 
               {/* Table Actions */}
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex space-x-2">
-                    <button
-                      onClick={() => navigate(`/post/create`)}
-                      className="px-4 py-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
-                    >
-                      <Plus size={16} />
-                      <span>Create</span>
-                    </button>
+                    {useAuthStore.getState()?.user && (
+                      <button
+                        onClick={() => navigate(`/post/create`)}
+                        className="px-4 py-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                      >
+                        <Plus size={16} />
+                        <span>Create</span>
+                      </button>
+                    )}
 
                     {/* File Upload Button */}
-                    <label className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 cursor-pointer">
-                      <Upload size={16} />
-                      <span>Upload</span>
-                      <input
-                        type="file"
-                        accept=".csv"
-                        ref={fileInputRef}
-                        onChange={handleUpload}
-                        className="hidden"
-                      />
-                    </label>
+                    {useAuthStore.getState()?.user && (
+                      <label className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 cursor-pointer">
+                        <Upload size={16} />
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          accept=".csv"
+                          ref={fileInputRef}
+                          onChange={handleUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
 
                     {/* Download Button - Disabled if no rows selected */}
                     <button
@@ -324,18 +331,20 @@ export default function PostList() {
                     </button>
 
                     {/* Delete Button - Disabled if no rows selected */}
-                    <button
-                      onClick={handleDelete}
-                      disabled={selectedRows.size == 0 && !selectAll}
-                      className={`px-4 py-2 ${
-                        selectedRows.size == 0 && !selectAll
-                          ? "bg-red-600/50 cursor-not-allowed"
-                          : "bg-red-600 hover:bg-red-700 cursor-pointer "
-                      } text-white  rounded-lg transition-colors duration-200 flex items-center space-x-2`}
-                    >
-                      <Trash2 size={16} />
-                      <span>Delete</span>
-                    </button>
+                    {useAuthStore.getState()?.user && (
+                      <button
+                        onClick={handleDelete}
+                        disabled={selectedRows.size == 0 && !selectAll}
+                        className={`px-4 py-2 ${
+                          selectedRows.size == 0 && !selectAll
+                            ? "bg-red-600/50 cursor-not-allowed"
+                            : "bg-red-600 hover:bg-red-700 cursor-pointer "
+                        } text-white  rounded-lg transition-colors duration-200 flex items-center space-x-2`}
+                      >
+                        <Trash2 size={16} />
+                        <span>Delete</span>
+                      </button>
+                    )}
                   </div>
 
                   <div className="flex items-center space-x-4">
@@ -381,13 +390,13 @@ export default function PostList() {
                 renderRow={(post) => {
                   return (
                     <>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 flex justify-center">
                         <input
                           type="checkbox"
                           checked={isRowSelected(post.id)}
                           onClick={(e) => e.stopPropagation()}
                           onChange={() => handleRowSelect(post.id)}
-                          className="w-4 h-4 text-purple-600 cursor-pointer ml-2.5 bg-white/10 border-white/30 rounded focus:ring-purple-500 focus:ring-2"
+                          className="w-4 h-4 text-purple-600 cursor-pointer flex bg-white/10 border-white/30 rounded focus:ring-purple-500 focus:ring-2"
                         />
                       </td>
 
@@ -428,14 +437,16 @@ export default function PostList() {
                         {dateFormat(post.created_at)}
                       </td>
 
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => navigate(`${POST.EDIT}/${post.id}`)}
-                          className="p-2 cursor-pointer text-purple-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </td>
+                      {useAuthStore.getState()?.user && (
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => navigate(`${POST.EDIT}/${post.id}`)}
+                            className="p-2 cursor-pointer text-purple-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                          >
+                            <Edit size={16} />
+                          </button>
+                        </td>
+                      )}
                     </>
                   );
                 }}

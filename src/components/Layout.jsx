@@ -94,128 +94,134 @@ export default function Layout({ children, activeRoute }) {
       </div>
 
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-lg border-b relative z-50 border-white/20 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-1.5 text-white cursor-pointer rounded-full bg-white/10 transition-colors -mb-5"
-            >
-              {isSidebarOpen ? (
-                <ChevronsLeftIcon size={22} />
-              ) : (
-                <Menu size={20} />
-              )}
-            </button>
-            <Logo className="h-16 -mt-3" />
-          </div>
+      {useAuthStore.getState()?.user && (
+        <header className="bg-white/10 backdrop-blur-lg border-b relative z-50 border-white/20 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="p-1.5 text-white cursor-pointer rounded-full bg-white/10 transition-colors -mb-5"
+              >
+                {isSidebarOpen ? (
+                  <ChevronsLeftIcon size={22} />
+                ) : (
+                  <Menu size={20} />
+                )}
+              </button>
+              <Logo className="h-16 -mt-3" />
+            </div>
 
-          <div className="flex items-center space-x-6">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="text-white text-sm"
-            >
-              <span className="opacity-70 font-bold italic">Last Login : </span>
-              {dateFormat(useAuthStore.getState().user?.last_login_at)}
-            </motion.div>
-
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="flex items-center space-x-2"
-            >
-              <span className="text-white text-sm">
-                {Role[useAuthStore.getState().user?.role] ?? ""}
-              </span>
-            </motion.div>
-
-            <div className="relative">
-              {/* User name + dropdown icon */}
+            <div className="flex items-center space-x-6">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="flex items-center space-x-1 cursor-pointer select-none"
-                onClick={toggleDropdown}
+                className="text-white text-sm"
               >
-                <User className="text-gray-300 h-4 -mr-0.5" />
-                <span className="text-white font-medium text-mx italic">
-                  {user?.name ?? ""}
+                <span className="opacity-70 font-bold italic">
+                  Last Login :{" "}
                 </span>
-                {isOpen ? (
-                  <ChevronUp
-                    size={16}
-                    className="text-gray-800 font-bold px-1 py-1  bg-white/10 backdrop-blur-xl border-white/20  rounded-full"
-                  />
-                ) : (
-                  <ChevronDown
-                    size={16}
-                    className="text-gray-800  font-bold px-1 py-1  rounded-full bg-white/10 backdrop-blur-xl border-white/20 "
-                  />
-                )}
+                {dateFormat(useAuthStore.getState().user?.last_login_at)}
               </motion.div>
 
-              {/* Dropdown menu */}
-              {isOpen && (
-                <div className="absolute transition duration-300 z-50 right-0 mt-2 w-48 bg-white/10 backdrop-blur-lg rounded-lg border border-white/20 shadow-lg">
-                  <div className="py-2">
-                    <button
-                      className="w-full cursor-pointer flex items-center px-4 py-2 text-white hover:bg-white/10 transition-colors"
-                      onClick={() => {
-                        navigate("/profile");
-                      }}
-                    >
-                      <User size={16} className="mr-2" />
-                      Profile
-                    </button>
-                    <button
-                      className="w-full flex items-center px-4 py-2 text-white hover:bg-red-400/30 transition-colors"
-                      onClick={handleLogout}
-                    >
-                      <LogOut size={16} className="mr-2" />
-                      Logout
-                    </button>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="flex items-center space-x-2"
+              >
+                <span className="text-white text-sm">
+                  {Role[useAuthStore.getState().user?.role] ?? ""}
+                </span>
+              </motion.div>
+
+              <div className="relative">
+                {/* User name + dropdown icon */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  className="flex items-center space-x-1 cursor-pointer select-none"
+                  onClick={toggleDropdown}
+                >
+                  <User className="text-gray-300 h-4 -mr-0.5" />
+                  <span className="text-white font-medium text-mx italic">
+                    {user?.name ?? ""}
+                  </span>
+                  {isOpen ? (
+                    <ChevronUp
+                      size={16}
+                      className="text-gray-800 font-bold px-1 py-1  bg-white/10 backdrop-blur-xl border-white/20  rounded-full"
+                    />
+                  ) : (
+                    <ChevronDown
+                      size={16}
+                      className="text-gray-800  font-bold px-1 py-1  rounded-full bg-white/10 backdrop-blur-xl border-white/20 "
+                    />
+                  )}
+                </motion.div>
+
+                {/* Dropdown menu */}
+                {isOpen && (
+                  <div className="absolute transition duration-300 z-50 right-0 mt-2 w-48 bg-white/10 backdrop-blur-lg rounded-lg border border-white/20 shadow-lg">
+                    <div className="py-2">
+                      <button
+                        className="w-full cursor-pointer flex items-center px-4 py-2 text-white hover:bg-white/10 transition-colors"
+                        onClick={() => {
+                          navigate("/profile");
+                        }}
+                      >
+                        <User size={16} className="mr-2" />
+                        Profile
+                      </button>
+                      <button
+                        className="w-full flex items-center px-4 py-2 text-white hover:bg-red-400/30 transition-colors"
+                        onClick={handleLogout}
+                      >
+                        <LogOut size={16} className="mr-2" />
+                        Logout
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       <div className="flex h-[calc(100vh-64px)]">
         {/* Sidebar */}
-        <motion.aside
-          initial={{ x: -300 }}
-          animate={{ x: isSidebarOpen ? 0 : -300 }}
-          transition={{ type: "spring", damping: 20 }}
-          className={`bg-white/10 backdrop-blur-lg border-r border-white/20 w-64 ${
-            isSidebarOpen ? "block" : "hidden"
-          }`}
-        >
-          <nav className="mt-8 px-4">
-            <ul className="space-y-2">
-              {menuItems.map((item) => (
-                <li key={item.id}>
-                  <button
-                    onClick={() => goRoute(item.url)}
-                    className={`flex cursor-pointer items-center w-full px-4 py-3 text-white rounded-lg transition-all duration-200 ${
-                      activeRoute === item.id
-                        ? "bg-blue-500/30 border-l-4 border-blue-500"
-                        : "hover:bg-white/10"
-                    }`}
-                  >
-                    <item.icon size={20} className="mr-3" />
-                    {item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </motion.aside>
+        {useAuthStore.getState()?.user && (
+          <motion.aside
+            initial={{ x: -300 }}
+            animate={{ x: isSidebarOpen ? 0 : -300 }}
+            transition={{ type: "spring", damping: 20 }}
+            className={`bg-white/10 backdrop-blur-lg border-r border-white/20 w-64 ${
+              isSidebarOpen ? "block" : "hidden"
+            }`}
+          >
+            <nav className="mt-8 px-4">
+              <ul className="space-y-2">
+                {menuItems.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => goRoute(item.url)}
+                      className={`flex cursor-pointer items-center w-full px-4 py-3 text-white rounded-lg transition-all duration-200 ${
+                        activeRoute === item.id
+                          ? "bg-blue-500/30 border-l-4 border-blue-500"
+                          : "hover:bg-white/10"
+                      }`}
+                    >
+                      <item.icon size={20} className="mr-3" />
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </motion.aside>
+        )}
 
         {children}
       </div>
