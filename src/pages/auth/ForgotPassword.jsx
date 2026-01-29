@@ -3,14 +3,32 @@ import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import Logo from "../../components/Logo";
 import { Link } from "react-router-dom";
+import { forgotPassword } from "../../hooks/useAuth";
+import ErrorMessage from "../../components/ErrorMessage";
 
 export default function App() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
+  const mutation = forgotPassword();
 
   const handleSubmit = (e) => {
+    setSubmitted(false);
+    setErrorMessage(null);
     e.preventDefault();
-    setSubmitted(true);
+    const payload = { ...(email && { email }) };
+    mutation.mutate(payload, {
+      onSuccess: (data) => {
+        console.log("success forgot api", data);
+        setSuccessMessage(data?.msg);
+        setSubmitted(true);
+      },
+      onError: (error) => {
+        console.log("error", error);
+        setErrorMessage(error.response.data.errors || "Forgot Password Fail.");
+      },
+    });
   };
 
   const goBack = () => {
@@ -53,65 +71,46 @@ export default function App() {
           {submitted && (
             <>
               <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-white mb-2">
-                Email Sent!
-              </h1>
-              <p className="text-purple-200">
-                Check your inbox for password reset instructions
-              </p>
+              <p className="text-green-200 font-bold">{successMessage}</p>
             </>
           )}
         </div>
 
         {/* Reset Password Form */}
-        {!submitted ? (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Field */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="relative"
-            >
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-300 w-5 h-5" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
-                  required
-                />
-              </div>
-            </motion.div>
-
-            {/* Reset Password Button */}
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25"
-            >
-              Send Reset Link
-            </motion.button>
-          </form>
-        ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email Field */}
           <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="relative"
+          >
+            <div className="relative">
+              <Mail className="absolute z-10 left-4 top-1/2 transform -translate-y-1/2 text-purple-300 w-5 h-5" />
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={mutation?.isPending}
+                placeholder="Enter your email"
+                className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed focus:ring-purple-400 focus:border-transparent transition-all duration-300"
+              />
+            </div>
+            <ErrorMessage message={errorMessage?.email || errorMessage} />
+          </motion.div>
+
+          {/* Reset Password Button */}
+          <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-center"
+            transition={{ delay: 0.4 }}
+            type="submit"
+            disabled={mutation?.isPending}
+            className="w-full bg-gradient-to-r cursor-pointer from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 disabled:bg-white/10 shadow-lg hover:shadow-purple-500/25 disabled:cursor-not-allowed"
           >
-            <button
-              onClick={goBack}
-              className="mt-6 text-purple-200 hover:text-white text-sm font-medium transition-colors duration-200 underline"
-            >
-              Back to login page
-            </button>
-          </motion.div>
-        )}
+            Send Reset Link {mutation?.isPending ? "true" : "false"}
+          </motion.button>
+        </form>
       </motion.div>
     </div>
   );

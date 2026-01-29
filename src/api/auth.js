@@ -30,3 +30,8 @@ export const logOutApi = async (refreshToken) => {
 
   return response.data;
 };
+
+export const forgotPasswordApi = async (payload) => {
+  const response = await client.post(AUTH.FORGOT_PASSWORD, payload);
+  return response.data;
+};

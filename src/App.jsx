@@ -23,6 +23,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ChangePassword />} />
       <Route path="/posts" element={<PostList />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/post/create" element={<PostCreate />} />

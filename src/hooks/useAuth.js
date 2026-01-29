@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { loginApi, refreshApi } from "../api/auth";
+import { forgotPasswordApi, loginApi, refreshApi } from "../api/auth";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import useAuthStore from "../store/useAuthStore";
@@ -88,6 +88,23 @@ export const useLogin = () => {
     onError: (error) => {
       console.error(
         "Login failed:",
+        error.response?.data?.message ?? error.message,
+      );
+    },
+  });
+};
+
+export const forgotPassword = () => {
+  return useMutation({
+    mutationFn: forgotPasswordApi,
+    onSuccess: (data) => {
+      console.log("Forgot Password Success.");
+      // saveTokenAndAuth(TOKEN.ACCESS_TOKEN, data.access_token);
+      // saveTokenAndAuth(TOKEN.REFRESH_TOKEN, data.refresh_token, false);
+    },
+    onError: (error) => {
+      console.error(
+        "Forgot Password Fail:",
         error.response?.data?.message ?? error.message,
       );
     },

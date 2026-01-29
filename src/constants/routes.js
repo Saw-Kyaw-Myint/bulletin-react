@@ -1,6 +1,7 @@
 export const AUTH = {
   LOGIN: "/login",
   LOGOUT: "/logout",
+  FORGOT_PASSWORD: "/forgot-password",
 };
 
 export const USER = {
