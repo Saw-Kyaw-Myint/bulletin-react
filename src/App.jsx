@@ -15,27 +15,32 @@ import UserEdit from "./pages/users/UserEdit";
 import Profile from "./pages/users/Profile";
 import ProfileEdit from "./pages/users/ProfilEdit";
 import PostEdit from "./pages/posts/PostEdit";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import GuestRoute from "./components/GuestRoute";
 
 const App = () => {
   useAuthInit();
 
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ChangePassword />} />
+      <Route element={<GuestRoute />}>
+        <Route path="/" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ChangePassword />} />
+      </Route>
       <Route path="/posts" element={<PostList />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/post/create" element={<PostCreate />} />
         <Route path="/post/:id" element={<PostDetail />} />
         <Route path="/post/edit/:id" element={<PostEdit />} />
-        <Route path="/users" element={<UsersList />} />
-        <Route path="/user/create" element={<UserCreate />} />
-        <Route path="/user/edit/:id" element={<UserEdit />} />
-        <Route path="/user/:id" element={<UserDetail />} />
+        <Route element={<ProtectedAdminRoute />}>
+          <Route path="/users" element={<UsersList />} />
+          <Route path="/user/create" element={<UserCreate />} />
+          <Route path="/user/edit/:id" element={<UserEdit />} />
+          <Route path="/user/:id" element={<UserDetail />} />
+        </Route>
         <Route path="/profile" element={<Profile />} />
         <Route path="/profile/edit" element={<ProfileEdit />} />
-        <Route path="/user/change-password" element={<ChangePassword />} />
       </Route>
     </Routes>
   );

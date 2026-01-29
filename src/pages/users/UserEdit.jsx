@@ -19,9 +19,9 @@ import Loading from "../../components/Loading";
 import FormSelect from "../../components/Form/FormSelect";
 import ErrorMessage from "../../components/ErrorMessage";
 
-import { Role, RoleText, userRolesOptions } from "../../constants/commons";
+import { RoleText } from "../../constants/commons";
 import { getUser, updateUser } from "../../hooks/useUser";
-import { dateFormat, formatDateToISO } from "../../utils/date";
+import { formatDateToISO } from "../../utils/date";
 import useAuthStore from "../../store/useAuthStore";
 import UserEditForm from "../../components/Form/UserEditForm";
 
@@ -52,14 +52,14 @@ const UserEdit = () => {
     if (data) {
       setFormData({
         user_id: user?.id,
-        name: data.name || "",
-        email: data.email || "",
+        name: data?.name || "",
+        email: data?.email || "",
         password: "",
         confirm_password: "",
-        role: Number(data.role) ? RoleText.Admin : RoleText.User,
-        phone: data.phone || "",
-        dob: data.dob ? formatDateToISO(data.dob) : "",
-        address: data.address || "",
+        role: data?.role ? RoleText.User : RoleText.Admin,
+        phone: data?.phone || "",
+        dob: data?.dob ? formatDateToISO(data.dob) : "",
+        address: data?.address || "",
         profile: null,
       });
       if (data.profile_path) {
@@ -97,8 +97,8 @@ const UserEdit = () => {
         confirm_password: "",
         role: data.role
           ? RoleText.User
-          : RoleText.User == 0
-            ? RoleText.User
+          : RoleText.Admin == 0
+            ? RoleText.Admin
             : "",
         phone: data.phone || "",
         dob: data.dob || "",

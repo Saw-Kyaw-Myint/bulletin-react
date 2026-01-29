@@ -38,7 +38,7 @@ const ProfileEdit = () => {
         email: data.email || "",
         password: "",
         confirm_password: "",
-        role: Number(data.role) ? RoleText.Admin : RoleText.User,
+        role: Number(data.role) ? RoleText.User : RoleText.Admin,
         phone: data.phone || "",
         dob: data.dob ? formatDateToISO(data.dob) : "",
         address: data.address || "",
@@ -79,8 +79,8 @@ const ProfileEdit = () => {
         confirm_password: "",
         role: data.role
           ? RoleText.User
-          : RoleText.User == 0
-            ? RoleText.User
+          : RoleText.Admin == 0
+            ? RoleText.Admin
             : "",
         phone: data.phone || "",
         dob: data.dob || "",
@@ -118,7 +118,7 @@ const ProfileEdit = () => {
     mutation.mutate(form, {
       onSuccess: (res) => {
         if (res.user) {
-          setUser(res.user);
+          useAuthStore.getState().setUser(res.user);
         }
         alert(res?.message || "User updated successfully");
       },

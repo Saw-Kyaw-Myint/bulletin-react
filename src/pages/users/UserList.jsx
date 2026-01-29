@@ -199,8 +199,6 @@ const UsersList = () => {
       const payload = selectAll
         ? { all: true, exclude_ids: Array.from(excludeRows) }
         : { post_ids: Array.from(selectedRows) };
-
-      console.log("payload", payload);
       await deleteUserFn(payload);
       resetSelectedRows();
       setSelectAll(false);

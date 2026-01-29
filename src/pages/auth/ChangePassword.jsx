@@ -2,42 +2,73 @@ import React, { useState, useEffect } from "react";
 import { Lock, RefreshCw, Save, Eye, EyeOff } from "lucide-react";
 import Loading from "../../components/Loading";
 import Layout from "../../components/Layout";
+import { resetPassword } from "../../hooks/useAuth";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import ErrorMessage from "../../components/ErrorMessage";
+import { AUTH } from "../../constants/routes";
 
 const ChangePassword = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     password: "",
-    password_confirm: "",
+    confirm_password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const mutation = resetPassword();
+  const [searchParams] = useSearchParams();
+  const [errorMessage, setErrorMessage] = useState(null);
+  const token = searchParams.get("token");
+  const navigate = useNavigate();
 
   // Simulate loading state
   useEffect(() => {
+    if (!token) {
+      navigate(AUTH.FORGOT_PASSWORD);
+    }
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 800); // Simulate 1 second of loading
+    }, 100);
 
     return () => clearTimeout(timer);
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    setErrorMessage(null);
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleReset = () => {
     setFormData({
       password: "",
-      password_confirm: "",
+      confirm_password: "",
     });
     setShowPassword(false);
+    setErrorMessage(null);
     setShowConfirmPassword(false);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission logic here
+    const payload = {
+      ...(formData.password && { password: formData.password }),
+      ...(formData.confirm_password && {
+        confirm_password: formData.confirm_password,
+      }),
+      ...(token && { token }),
+    };
+    mutation.mutate(payload, {
+      onSuccess: (data) => {
+        alert(data?.msg);
+        navigate("/");
+        handleReset();
+      },
+      onError: (error) => {
+        setErrorMessage(error.response.data.errors || "Forgot Password Fail.");
+      },
+    });
   };
 
   return (
@@ -63,6 +94,7 @@ const ChangePassword = () => {
               </div>
 
               <div className="space-y-6">
+                <ErrorMessage message={errorMessage?.token} />
                 {/* Current Password */}
                 <div>
                   <label className="block text-white text-sm font-medium mb-2 flex items-center">
@@ -77,7 +109,6 @@ const ChangePassword = () => {
                       onChange={handleInputChange}
                       className="w-full pl-4 pr-12 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
                       placeholder="Enter new password"
-                      required
                     />
                     <button
                       type="button"
@@ -87,6 +118,7 @@ const ChangePassword = () => {
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
+                  <ErrorMessage message={errorMessage?.password} />
                 </div>
 
                 {/* Confirm Password */}
@@ -98,12 +130,11 @@ const ChangePassword = () => {
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
-                      name="password_confirm"
-                      value={formData.password_confirm}
+                      name="confirm_password"
+                      value={formData.confirm_password}
                       onChange={handleInputChange}
                       className="w-full pl-4 pr-12 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
                       placeholder="Confirm new password"
-                      required
                     />
                     <button
                       type="button"
@@ -119,6 +150,7 @@ const ChangePassword = () => {
                       )}
                     </button>
                   </div>
+                  <ErrorMessage message={errorMessage?.confirm_password} />
                 </div>
 
                 {/* Action Buttons */}

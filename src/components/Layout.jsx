@@ -14,7 +14,7 @@ import {
 import { motion } from "framer-motion";
 import Logo from "./Logo";
 import useAuthStore from "../store/useAuthStore";
-import { Role } from "../constants/commons";
+import { Role, RoleText } from "../constants/commons";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { dateFormat } from "../utils/date";
@@ -22,12 +22,10 @@ import { forceLogout } from "../lib/auth";
 
 export default function Layout({ children, activeRoute }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeMenu, setActiveMenu] = useState("post-list");
   const { user } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [cookie, removeCookie] = useCookies(["access_token"]);
   const navigate = useNavigate();
-
+  const isAdmin = useAuthStore.getState()?.user?.role === RoleText.Admin;
   // Mock data for dashboard
   const stats = [
     {
@@ -64,13 +62,22 @@ export default function Layout({ children, activeRoute }) {
       icon: FileText,
       url: "/post/create",
     },
-    { id: "user-list", label: "User List", icon: Users, url: "/users" },
-    {
-      id: "user-create",
-      label: "User Create",
-      icon: UserPlus,
-      url: "/user/create",
-    },
+    ...(isAdmin
+      ? [
+          {
+            id: "user-list",
+            label: "User List",
+            icon: Users,
+            url: "/users",
+          },
+          {
+            id: "user-create",
+            label: "User Create",
+            icon: UserPlus,
+            url: "/user/create",
+          },
+        ]
+      : []),
   ];
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);

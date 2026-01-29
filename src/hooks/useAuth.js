@@ -1,5 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { forgotPasswordApi, loginApi, refreshApi } from "../api/auth";
+import {
+  forgotPasswordApi,
+  loginApi,
+  refreshApi,
+  resetPasswordApi,
+} from "../api/auth";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import useAuthStore from "../store/useAuthStore";
@@ -14,7 +19,7 @@ export const useAuthInit = () => {
   const [accessCookies, , removeAccessCookie] = useCookies(["access_token"]);
   const [refreshCookies, , removeRefreshCookie] = useCookies(["refresh_token"]);
 
-  const { setUser, removeAuthUser } = useAuthStore();
+  const { user, setUser, removeAuthUser } = useAuthStore();
 
   const callRefreshApi = async (refreshToken) => {
     try {
@@ -58,8 +63,9 @@ export const useAuthInit = () => {
           removeAuthUser();
           return;
         }
-
-        setUser(decoded.user);
+        if (!user) {
+          setUser(decoded.user);
+        }
       } catch (error) {
         removeAccessCookie("access_token");
         removeAuthUser();
@@ -99,12 +105,25 @@ export const forgotPassword = () => {
     mutationFn: forgotPasswordApi,
     onSuccess: (data) => {
       console.log("Forgot Password Success.");
-      // saveTokenAndAuth(TOKEN.ACCESS_TOKEN, data.access_token);
-      // saveTokenAndAuth(TOKEN.REFRESH_TOKEN, data.refresh_token, false);
     },
     onError: (error) => {
       console.error(
         "Forgot Password Fail:",
+        error.response?.data?.message ?? error.message,
+      );
+    },
+  });
+};
+
+export const resetPassword = () => {
+  return useMutation({
+    mutationFn: resetPasswordApi,
+    onSuccess: (data) => {
+      console.log("Reset Password Success.");
+    },
+    onError: (error) => {
+      console.error(
+        "Reset Password Fail:",
         error.response?.data?.message ?? error.message,
       );
     },

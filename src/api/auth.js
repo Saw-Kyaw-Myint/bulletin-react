@@ -35,3 +35,8 @@ export const forgotPasswordApi = async (payload) => {
   const response = await client.post(AUTH.FORGOT_PASSWORD, payload);
   return response.data;
 };
+
+export const resetPasswordApi = async (payload) => {
+  const response = await client.post(AUTH.RESET_PASSWORD, payload);
+  return response.data;
+};

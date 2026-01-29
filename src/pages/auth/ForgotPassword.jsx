@@ -20,12 +20,10 @@ export default function App() {
     const payload = { ...(email && { email }) };
     mutation.mutate(payload, {
       onSuccess: (data) => {
-        console.log("success forgot api", data);
         setSuccessMessage(data?.msg);
         setSubmitted(true);
       },
       onError: (error) => {
-        console.log("error", error);
         setErrorMessage(error.response.data.errors || "Forgot Password Fail.");
       },
     });
@@ -90,7 +88,10 @@ export default function App() {
               <input
                 type="text"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setSubmitted(false);
+                  setEmail(e.target.value);
+                }}
                 disabled={mutation?.isPending}
                 placeholder="Enter your email"
                 className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed focus:ring-purple-400 focus:border-transparent transition-all duration-300"
@@ -108,7 +109,7 @@ export default function App() {
             disabled={mutation?.isPending}
             className="w-full bg-gradient-to-r cursor-pointer from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 disabled:bg-white/10 shadow-lg hover:shadow-purple-500/25 disabled:cursor-not-allowed"
           >
-            Send Reset Link {mutation?.isPending ? "true" : "false"}
+            Send Reset Link
           </motion.button>
         </form>
       </motion.div>

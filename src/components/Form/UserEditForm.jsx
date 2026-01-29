@@ -127,7 +127,6 @@ const UserEditForm = ({
                 {field === "address" && <MapPin size={16} className="mr-2" />}
                 {field.replace("_", " ").toUpperCase()}
               </label>
-
               {field === "role" ? (
                 <FormSelect
                   name="role"

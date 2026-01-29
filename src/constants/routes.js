@@ -2,6 +2,7 @@ export const AUTH = {
   LOGIN: "/login",
   LOGOUT: "/logout",
   FORGOT_PASSWORD: "/forgot-password",
+  RESET_PASSWORD: "/reset-password",
 };
 
 export const USER = {
