@@ -2,19 +2,31 @@ import Layout from "../../components/Layout";
 import { createPost } from "../../hooks/usePost";
 import PostForm from "../../components/Form/PostForm";
 import { useState } from "react";
+import { createPostApi } from "../../api/post";
+import { useQueryClient } from "@tanstack/react-query";
+import { confirmApi } from "../../lib/common";
 
 const PostCreate = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const mutation = createPost();
+  const queryClient = useQueryClient();
+
   const handleSubmit = (formData, setError) => {
     const payload = {
       ...(formData.title && { title: formData.title }),
       ...(formData.description && { description: formData.description }),
     };
     mutation.mutate(payload, {
-      onSuccess: (res) => {
-        alert(res.msg);
-        setIsSuccess(true);
+      onSuccess: async (res) => {
+        if (res?.is_valid_request) {
+          await confirmApi({
+            apiFn: createPostApi,
+            payload,
+            queryClient,
+            invalidateKeys: [["posts"]],
+            onSuccess: () => setIsSuccess(true),
+          });
+        }
       },
       onError: (err) => {
         setIsSuccess(false);

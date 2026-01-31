@@ -2,7 +2,6 @@ import { jwtDecode } from "jwt-decode";
 import { Cookies } from "react-cookie";
 import useAuthStore from "../store/useAuthStore";
 import { TOKEN } from "../constants/commons";
-import { logOutApi } from "../api/auth";
 import client from "../provider/axios";
 
 const cookies = new Cookies();
@@ -26,11 +25,11 @@ export const saveTokenAndAuth = (tokeName, token, saveAuth = true) => {
 export const logout = (deleteSession = true) => {
   cookies.remove(TOKEN.ACCESS_TOKEN);
   cookies.remove(TOKEN.REFRESH_TOKEN);
-  const { removeAuthUser } = useAuthStore.getState();
   if (deleteSession) {
-    removeAuthUser();
+    useAuthStore.getState().removeAuthUser();
   }
 };
+
 export const getCookie = (name) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);

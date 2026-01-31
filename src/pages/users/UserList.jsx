@@ -198,7 +198,7 @@ const UsersList = () => {
     try {
       const payload = selectAll
         ? { all: true, exclude_ids: Array.from(excludeRows) }
-        : { post_ids: Array.from(selectedRows) };
+        : { user_ids: Array.from(selectedRows) };
       await deleteUserFn(payload);
       resetSelectedRows();
       setSelectAll(false);
@@ -504,7 +504,7 @@ const UsersList = () => {
         open={showConfirmDelete}
         title="Confirm Deletion"
         description={`Are you sure you want to delete ${
-          selectedRows.size
+          selectAll ? "all " : selectedRows.size
         } selected user${
           selectedRows.size !== 1 ? "s" : ""
         }? This action cannot be undone.`}

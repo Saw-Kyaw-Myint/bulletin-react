@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Edit, Plus, Upload, Download, Trash2 } from "lucide-react";
 import Layout from "../../components/Layout";
@@ -149,7 +149,7 @@ export default function PostList() {
       }
       if (Array.from(selectedRows).length || selectAll) {
         const payload = selectAll
-          ? { all: true, exclude_ids: Array.from(excludeRows) }
+          ? { all: true, exclude_ids: Array.from(excludeRows), filters: params }
           : { post_ids: Array.from(selectedRows) };
         const response = await exportCSV(payload);
 
@@ -182,7 +182,7 @@ export default function PostList() {
   const confirmDelete = async () => {
     try {
       const payload = selectAll
-        ? { all: true, exclude_ids: Array.from(excludeRows) }
+        ? { all: true, exclude_ids: Array.from(excludeRows), filters: params }
         : { post_ids: Array.from(selectedRows) };
       await deleteUserFn(payload);
       setSelectedRows(new Set());
@@ -461,7 +461,7 @@ export default function PostList() {
         open={showConfirmDelete}
         title="Confirm Deletion"
         description={`Are you sure you want to delete ${
-          selectedRows.size
+          selectAll ? "all" : selectedRows.size
         } selected post${
           selectedRows.size !== 1 ? "s" : ""
         }? This action cannot be undone.`}

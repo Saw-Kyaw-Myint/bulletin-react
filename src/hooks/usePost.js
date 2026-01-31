@@ -49,7 +49,7 @@ export const updatePost = (id) => {
   return useMutation({
     mutationFn: (formData) => updatePostApi(formData, id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post"] });
     },
     onError: (error) => {
       console.error(error);
