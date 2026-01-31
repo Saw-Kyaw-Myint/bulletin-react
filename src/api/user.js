@@ -39,3 +39,8 @@ export const deleteUsersApi = async (payload) => {
   const response = await client.post(USER.MULTIPLE_DELETE, payload);
   return response.data;
 };
+
+export const changePasswordApi = async (payload, id) => {
+  const response = await client.post(`${USER.CHANGE_PASSWORD}/${id}`, payload);
+  return response.data;
+};

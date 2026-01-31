@@ -24,7 +24,6 @@ export const confirmApi = async ({
     if (payload) {
       payload.is_valid_request = true;
     }
-    console.log("update id", update_id);
     const res = update_id
       ? await apiFn(payload, update_id)
       : await apiFn(payload);

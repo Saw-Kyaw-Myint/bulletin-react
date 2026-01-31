@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  changePasswordApi,
   deleteUsersApi,
   getUserApi,
   userCreateApi,
@@ -95,6 +96,21 @@ export const deleteUsers = () => {
     },
     onError: (errors) => {
       console.error("delete User api", errors);
+    },
+  });
+};
+
+export const changePassword = (id) => {
+  return useMutation({
+    mutationFn: (payload) => changePasswordApi(payload, id),
+    onSuccess: (data) => {
+      console.log("Reset Password Success.");
+    },
+    onError: (error) => {
+      console.error(
+        "Reset Password Fail:",
+        error.response?.data?.message ?? error.message,
+      );
     },
   });
 };

@@ -36,6 +36,10 @@ const App = () => {
         <Route element={<ProtectedAdminRoute />}>
           <Route path="/users" element={<UsersList />} />
           <Route path="/user/create" element={<UserCreate />} />
+          <Route
+            path="/user/change-password/:id"
+            element={<ChangePassword />}
+          />
           <Route path="/user/edit/:id" element={<UserEdit />} />
           <Route path="/user/:id" element={<UserDetail />} />
         </Route>

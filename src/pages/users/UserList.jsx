@@ -150,7 +150,7 @@ const UsersList = () => {
   };
 
   const handleChangePassword = (userId) => {
-    navigate("/user/change-password");
+    navigate(`/user/change-password/${userId}`);
     setOpenSettings(null);
   };
 

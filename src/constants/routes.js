@@ -14,6 +14,7 @@ export const USER = {
   UNLOCK: "/users/unlock",
   DELETE: "/users/delete",
   MULTIPLE_DELETE: "/users/multiple-delete",
+  CHANGE_PASSWORD: "/users/change-password",
 };
 
 export const POST = {

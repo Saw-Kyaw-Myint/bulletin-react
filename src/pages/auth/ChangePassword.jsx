@@ -3,9 +3,15 @@ import { Lock, RefreshCw, Save, Eye, EyeOff } from "lucide-react";
 import Loading from "../../components/Loading";
 import Layout from "../../components/Layout";
 import { resetPassword } from "../../hooks/useAuth";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import ErrorMessage from "../../components/ErrorMessage";
 import { AUTH } from "../../constants/routes";
+import { changePassword } from "../../hooks/useUser";
 
 const ChangePassword = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -15,15 +21,18 @@ const ChangePassword = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const mutation = resetPassword();
   const [searchParams] = useSearchParams();
   const [errorMessage, setErrorMessage] = useState(null);
   const token = searchParams.get("token");
   const navigate = useNavigate();
+  const params = useParams();
+  const location = useLocation();
+  const mutation = resetPassword();
+  const changePasswordMutation = changePassword(params.id);
 
   // Simulate loading state
   useEffect(() => {
-    if (!token) {
+    if (!token && !params.id) {
       navigate(AUTH.FORGOT_PASSWORD);
     }
     const timer = setTimeout(() => {
@@ -59,16 +68,32 @@ const ChangePassword = () => {
       }),
       ...(token && { token }),
     };
-    mutation.mutate(payload, {
-      onSuccess: (data) => {
-        alert(data?.msg);
-        navigate("/");
-        handleReset();
-      },
-      onError: (error) => {
-        setErrorMessage(error.response.data.errors || "Forgot Password Fail.");
-      },
-    });
+    if (location.pathname.startsWith("/user/change-password")) {
+      changePasswordMutation.mutate(payload, {
+        onSuccess: (data) => {
+          alert(data?.msg);
+          handleReset();
+        },
+        onError: (error) => {
+          setErrorMessage(
+            error.response?.data?.errors || "Change Password Fail.",
+          );
+        },
+      });
+    } else {
+      mutation.mutate(payload, {
+        onSuccess: (data) => {
+          alert(data?.msg);
+          navigate("/");
+          handleReset();
+        },
+        onError: (error) => {
+          setErrorMessage(
+            error.response.data.errors || "Forgot Password Fail.",
+          );
+        },
+      });
+    }
   };
 
   return (
