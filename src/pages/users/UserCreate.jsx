@@ -21,6 +21,9 @@ import FormSelect from "../../components/Form/FormSelect";
 import { userRolesOptions } from "../../constants/commons";
 import ErrorMessage from "../../components/ErrorMessage";
 import useAuthStore from "../../store/useAuthStore";
+import { confirmApi } from "../../lib/common";
+import { userCreateApi } from "../../api/user";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UserCreate = () => {
   const { user } = useAuthStore();
@@ -39,6 +42,7 @@ const UserCreate = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const queryClient = useQueryClient();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,9 +96,15 @@ const UserCreate = () => {
     }
 
     mutation.mutate(data, {
-      onSuccess: (res) => {
-        alert(res?.msg);
-        handleReset();
+      onSuccess: async (res) => {
+        data.append("is_valid_request", true);
+        await confirmApi({
+          apiFn: userCreateApi,
+          payload: data,
+          queryClient,
+          invalidateKeys: [["users"]],
+          onSuccess: () => handleReset(),
+        });
       },
       onError: (error) => {
         setErrorMessage(error.response.data.errors || "Login failed");

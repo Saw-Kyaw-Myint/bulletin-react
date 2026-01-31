@@ -114,6 +114,7 @@ const ProfileEdit = () => {
     } else if (!previewImage) {
       form.append("profile", "");
     }
+    form.append("is_valid_request", true);
 
     mutation.mutate(form, {
       onSuccess: (res) => {

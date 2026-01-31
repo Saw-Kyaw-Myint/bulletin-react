@@ -24,6 +24,9 @@ import { getUser, updateUser } from "../../hooks/useUser";
 import { formatDateToISO } from "../../utils/date";
 import useAuthStore from "../../store/useAuthStore";
 import UserEditForm from "../../components/Form/UserEditForm";
+import { confirmApi } from "../../lib/common";
+import { useQueryClient } from "@tanstack/react-query";
+import { userUpdateApi } from "../../api/user";
 
 const UserEdit = () => {
   const { id } = useParams();
@@ -46,6 +49,7 @@ const UserEdit = () => {
 
   const [previewImage, setPreviewImage] = useState(null);
   const [errorMessage, setErrorMessage] = useState({});
+  const queryClient = useQueryClient();
 
   // When API data is loaded, populate formData
   useEffect(() => {
@@ -133,9 +137,17 @@ const UserEdit = () => {
     }
 
     mutation.mutate(form, {
-      onSuccess: (res) => {
-        handleReset();
-        alert(res?.message || "User updated successfully");
+      onSuccess: async (res) => {
+        if (res?.is_valid_request) {
+          form.append("is_valid_request", true);
+          await confirmApi({
+            apiFn: userUpdateApi,
+            update_id: id,
+            payload: form,
+            queryClient,
+            invalidateKeys: [["users"]],
+          });
+        }
       },
       onError: (err) => {
         const backendErrors = err?.response?.data?.errors || {};
