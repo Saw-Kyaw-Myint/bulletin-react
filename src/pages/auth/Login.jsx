@@ -24,7 +24,7 @@ export default function Login() {
     }
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       ...(email && { email }),
@@ -174,12 +174,15 @@ export default function Login() {
           transition={{ delay: 0.7 }}
           className="text-center mt-8"
         >
-          {/* <p className="text-purple-200 text-sm">
+          <p className="text-purple-200 text-sm">
             Don't have an account?{" "}
-            <button className="text-white font-medium cursor-pointer hover:icon-purple transition-colors">
+            <button
+              onClick={() => navigate("/register")}
+              className="text-white font-medium cursor-pointer hover:icon-purple transition-colors"
+            >
               Sign up
             </button>
-          </p> */}
+          </p>
         </motion.div>
       </motion.div>
     </div>

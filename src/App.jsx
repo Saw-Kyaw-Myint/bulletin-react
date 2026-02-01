@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import PostList from "./pages/posts/PostList";
@@ -17,6 +17,7 @@ import ProfileEdit from "./pages/users/ProfilEdit";
 import PostEdit from "./pages/posts/PostEdit";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import GuestRoute from "./components/GuestRoute";
+import Register from "./pages/auth/Register";
 
 const App = () => {
   useAuthInit();
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ChangePassword />} />
+        <Route path="/register" element={<Register />} />
       </Route>
       <Route path="/posts" element={<PostList />} />
       <Route element={<ProtectedRoute />}>

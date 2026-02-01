@@ -1,6 +1,11 @@
 import { AUTH } from "../constants/routes";
 import client from "../provider/axios";
 
+export const registerApi = async (payload) => {
+  const response = await client.post(AUTH.REGISTER, payload);
+  return response.data;
+};
+
 export const loginApi = async (payload) => {
   const response = await client.post(AUTH.LOGIN, payload);
   return response.data;

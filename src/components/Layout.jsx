@@ -86,8 +86,8 @@ export default function Layout({ children, activeRoute }) {
     navigate(url, { replace: true });
   };
 
-  const handleLogout = () => {
-    forceLogout();
+  const handleLogout = async () => {
+    await forceLogout();
     navigate("/", { replace: true });
   };
 

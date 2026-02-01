@@ -23,6 +23,8 @@ import { POST } from "../../constants/routes";
 import { exportCSV } from "../../api/post";
 import UploadToast from "../../components/UploadToast";
 import useAuthStore from "../../store/useAuthStore";
+import CsvErrorPanel from "../../components/CsvErrorPanel ";
+import ErrorMessage from "../../components/ErrorMessage";
 
 export default function PostList() {
   const statusOptions = [
@@ -50,6 +52,7 @@ export default function PostList() {
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [excludeRows, setExcludeRows] = useState(new Set());
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [page, setPage] = useState(1);
   const [params, setParams] = useState(null);
   const [taskId, setTaskId] = useState(null);
@@ -106,6 +109,7 @@ export default function PostList() {
   };
 
   const handleUpload = (e) => {
+    setErrorMessage(null);
     const file = e.target.files[0];
     if (file) {
       // Check if file is not Excel format
@@ -123,8 +127,7 @@ export default function PostList() {
             setTaskId(res?.task_id ?? 0);
           },
           onError: (error) => {
-            console.error("CSV Import Fail.", error);
-            // setErrorMessage(error.response.errors || "Csv Import Fail.");
+            setErrorMessage(error.response.errors || "Csv Import Fail.");
           },
           onSettled: () => {
             if (fileInputRef.current) {
@@ -199,7 +202,7 @@ export default function PostList() {
   };
 
   const { data: posts, isLoading } = postList({ page, ...params });
-  const { data: uploadProgress } = csvProgress(taskId);
+  const { data: uploadProgress, isError } = csvProgress(taskId);
 
   const finishUpload = (uploadProgress?.progress ?? 0) >= 100;
 
@@ -228,6 +231,7 @@ export default function PostList() {
       {/* Main Content */}
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
+          {!errorMessage && <CsvErrorPanel uploadProgress={uploadProgress} />}
           {isLoading ? (
             <Loading />
           ) : (
@@ -289,7 +293,8 @@ export default function PostList() {
 
               {/* Table Actions */}
               <div className="relative z-10">
-                <div className="flex items-center justify-between mb-6">
+                <ErrorMessage message={errorMessage} />
+                <div className="flex items-center justify-between mb-6 mt-3">
                   <div className="flex space-x-2">
                     {useAuthStore.getState()?.user && (
                       <button
@@ -308,7 +313,6 @@ export default function PostList() {
                         <span>Upload</span>
                         <input
                           type="file"
-                          accept=".csv"
                           ref={fileInputRef}
                           onChange={handleUpload}
                           className="hidden"
@@ -471,7 +475,7 @@ export default function PostList() {
         cancelText="Cancel"
       />
 
-      {taskId && (
+      {taskId && !errorMessage && (
         <UploadToast
           uploadProgress={uploadProgress}
           finishUpload={finishUpload}

@@ -46,10 +46,10 @@ export const forceLogout = async () => {
       },
     };
 
-    const res = await client.post("/logout", {}, options);
-    logout();
+    await client.post("/logout", {}, options);
   } catch (error) {
     console.log("Force Logout Error => ", error);
+  } finally {
     logout();
   }
 };

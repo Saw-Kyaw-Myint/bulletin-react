@@ -1,4 +1,5 @@
 export const AUTH = {
+  REGISTER: "/register",
   LOGIN: "/login",
   LOGOUT: "/logout",
   FORGOT_PASSWORD: "/forgot-password",

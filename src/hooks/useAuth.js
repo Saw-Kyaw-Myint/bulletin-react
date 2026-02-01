@@ -3,6 +3,7 @@ import {
   forgotPasswordApi,
   loginApi,
   refreshApi,
+  registerApi,
   resetPasswordApi,
 } from "../api/auth";
 import { jwtDecode } from "jwt-decode";
@@ -14,47 +15,45 @@ import { TOKEN } from "../constants/commons";
 import { useNavigate } from "react-router-dom";
 
 export const useAuthInit = () => {
-  const navigate = useNavigate();
-
   const [accessCookies, , removeAccessCookie] = useCookies(["access_token"]);
   const [refreshCookies, , removeRefreshCookie] = useCookies(["refresh_token"]);
+
+  const accessToken = accessCookies.access_token || null;
+  const refreshToken = refreshCookies.refresh_token || null;
 
   const { user, setUser, removeAuthUser } = useAuthStore();
 
   const callRefreshApi = async (refreshToken) => {
     try {
       const response = await refreshApi(refreshToken);
-
       saveTokenAndAuth(TOKEN.ACCESS_TOKEN, response.access_token);
       saveTokenAndAuth(TOKEN.REFRESH_TOKEN, response.refresh_token, false);
-
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
 
   useEffect(() => {
     const initAuth = async () => {
-      const accessToken = accessCookies.access_token;
-      const refreshToken = refreshCookies.refresh_token;
-
-      // 🔹 No access token
-      if (!accessToken) {
-        if (refreshToken) {
-          const refreshed = await callRefreshApi(refreshToken);
-
-          if (refreshed) {
-            navigate("/posts");
-            return;
-          }
-        }
-
+      // fully logged out
+      if (!accessToken && !refreshToken) {
         removeAuthUser();
         return;
       }
 
-      // 🔹 Access token exists
+      // try refresh
+      if (!accessToken && refreshToken) {
+        const refreshed = await callRefreshApi(refreshToken);
+
+        if (!refreshed) {
+          removeRefreshCookie("refresh_token");
+          removeAuthUser();
+        }
+        return;
+      }
+
+      // access token exists
       try {
         const decoded = jwtDecode(accessToken);
 
@@ -63,25 +62,30 @@ export const useAuthInit = () => {
           removeAuthUser();
           return;
         }
+
         if (!user) {
           setUser(decoded.user);
         }
-      } catch (error) {
+      } catch {
         removeAccessCookie("access_token");
         removeAuthUser();
       }
     };
 
     initAuth();
-  }, [
-    accessCookies,
-    refreshCookies,
-    navigate,
-    removeAccessCookie,
-    removeRefreshCookie,
-    setUser,
-    removeAuthUser,
-  ]);
+  }, [accessToken, refreshToken]);
+};
+
+export const register = () => {
+  return useMutation({
+    mutationFn: registerApi,
+    onError: (error) => {
+      console.error(
+        "Login failed:",
+        error.response?.data?.message ?? error.message,
+      );
+    },
+  });
 };
 
 export const useLogin = () => {
