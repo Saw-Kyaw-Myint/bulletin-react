@@ -7,6 +7,7 @@ const FormSelect = ({
   value,
   onChange,
   options = [],
+  isDisabled = false,
   className,
 }) => {
   return (
@@ -22,9 +23,10 @@ const FormSelect = ({
         value={value}
         onChange={onChange}
         className={cn(
-          "w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 appearance-none",
+          "w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 appearance-none disabled:bg-gray-400",
           className,
         )}
+        disabled={isDisabled}
       >
         <option value="" className="bg-gray-800" disabled selected>
           {placeholder ?? "selected value"}

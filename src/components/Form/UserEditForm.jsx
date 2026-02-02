@@ -16,11 +16,12 @@ import {
 } from "lucide-react";
 
 import ErrorMessage from "../ErrorMessage";
-import { userRolesOptions } from "../../constants/commons";
+import { Role, RoleText, userRolesOptions } from "../../constants/commons";
 import DatePicker from "../DatePicker";
 import FormSelect from "./FormSelect";
 
 const UserEditForm = ({
+  userRole,
   formName,
   formData,
   handleInputChange,
@@ -134,6 +135,7 @@ const UserEditForm = ({
                   onChange={handleInputChange}
                   options={userRolesOptions}
                   className="!py-3"
+                  isDisabled={userRole != RoleText.Admin}
                 />
               ) : field === "dob" ? (
                 <DatePicker

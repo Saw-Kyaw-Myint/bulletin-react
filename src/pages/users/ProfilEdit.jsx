@@ -141,6 +141,7 @@ const ProfileEdit = () => {
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-3xl mx-auto">
           <UserEditForm
+            userRole={user?.role}
             formName="Update Profile"
             formData={formData}
             handleInputChange={handleInputChange}

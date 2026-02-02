@@ -167,6 +167,7 @@ const UserEdit = () => {
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-4xl mx-auto">
           <UserEditForm
+            userRole={user?.role}
             formData={formData}
             handleInputChange={handleInputChange}
             handleFileChange={handleFileChange}
