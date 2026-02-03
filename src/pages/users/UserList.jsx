@@ -121,7 +121,7 @@ const UsersList = () => {
   };
 
   const handleLockUnlock = () => {
-    if (selectedRows.size > 0) {
+    if (selectedRows.size > 0 || selectAll) {
       setShowConfirmUnlock(true);
     }
   };
@@ -160,7 +160,7 @@ const UsersList = () => {
     deleteUsers();
 
   const isLockFunction = usersData?.data.some(
-    (user) => selectedRows.has(user.id) && user.lock_flg == true,
+    (user) => (selectedRows.has(user.id) || selectAll) && user.lock_flg == 1,
   );
 
   const resetSelectedRows = () => {
@@ -169,14 +169,11 @@ const UsersList = () => {
   };
 
   const confirmUnlock = async () => {
-    if (selectedRows.size > 10) {
-      alert("Please Select 10 Users.");
-      setShowConfirmUnlock(false);
-      return;
-    }
     if (!isLockFunction) {
       try {
-        const payload = { user_ids: Array.from(selectedRows) };
+        const payload = selectAll
+          ? { all: true, exclude_ids: Array.from(excludeRows), filters: params }
+          : { user_ids: Array.from(selectedRows) };
         await lockUserFn(payload);
         resetSelectedRows();
       } catch (error) {
@@ -184,7 +181,9 @@ const UsersList = () => {
       }
     } else {
       try {
-        const payload = { user_ids: Array.from(selectedRows) };
+        const payload = selectAll
+          ? { all: true, exclude_ids: Array.from(excludeRows), filters: params }
+          : { user_ids: Array.from(selectedRows) };
         await unLockUserFn(payload);
         resetSelectedRows();
       } catch (error) {
@@ -197,7 +196,7 @@ const UsersList = () => {
   const confirmDelete = async () => {
     try {
       const payload = selectAll
-        ? { all: true, exclude_ids: Array.from(excludeRows) }
+        ? { all: true, exclude_ids: Array.from(excludeRows), filters: params }
         : { user_ids: Array.from(selectedRows) };
       await deleteUserFn(payload);
       resetSelectedRows();
@@ -302,12 +301,12 @@ const UsersList = () => {
                       <button
                         onClick={handleLockUnlock}
                         disabled={
-                          selectedRows.size === 0 ||
+                          (selectedRows.size == 0 && !selectAll) ||
                           isLockUserLoading ||
                           isUnlockUserLoading
                         }
                         className={`px-4 py-2 ${
-                          selectedRows.size === 0
+                          selectedRows.size == 0 && !selectAll
                             ? "bg-yellow-600/50 cursor-not-allowed"
                             : "bg-yellow-600 hover:bg-yellow-700"
                         } text-white cursor-pointer rounded-lg transition-colors duration-200 flex items-center space-x-2 disabled:cursor-not-allowed`}
@@ -488,7 +487,7 @@ const UsersList = () => {
         title="Confirm Lock/Unlock"
         description={`Are you sure you want to
                   ${isLockFunction ? "unlock" : "lock"}
-                  ${selectedRows.size} selected
+                  ${selectAll ? "all " : selectedRows.size} selected
                   ${
                     selectedRows.size !== 1 ? "users?" : "user?"
                   } This action cannot be
