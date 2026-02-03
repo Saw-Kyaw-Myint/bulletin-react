@@ -94,7 +94,7 @@ const UserEditForm = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Left Column */}
         <div className="space-y-6">
-          {["name", "email", "password", "confirm_password"].map((field) => (
+          {["name", "email"].map((field) => (
             <div key={field}>
               <label className="block text-white text-sm font-medium mb-2 flex items-center">
                 {field === "name" && <User size={16} className="mr-2" />}
