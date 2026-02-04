@@ -117,8 +117,8 @@ MANDATORY RULES (DO NOT VIOLATE):
 
 OUTPUT FORMAT (STRICT):
 - If multiple files are present, repeat the format below per file
-- File name must be shown as plain text on its own line
 - Then show ONE diff block
+- File name must be shown as bold and underline
 - Then ONE **BOLD** explanation (1–3 sentences max)
 - Enter 'existing line'  code block and 'suggestion line' code block each file
 - Bold and underline to File Name
@@ -129,8 +129,8 @@ Do NOT add extra text, headings, or explanations outside this structure.
 
 VALID OUTPUT STRUCTURE:
 
-filename.py (Note => Bold and underline to this Line)
 ```diff
+// filename.py (Note => Bold and underline to this Line)
 -L23: existing line
 \n
 + suggestion line
@@ -168,7 +168,7 @@ CODE CHANGES TO REVIEW:
             )
 
         # ========== 5. POST COMMENT IN MARKDOWN DIFF ==========
-        comment_body = f"## 🤖 AI OverAll Changes Review \n\n {review_text}"
+        comment_body = f"## 🤖 AI PR Overall Review \n\n {review_text}"
         pr.create_issue_comment(comment_body)
 
         print(f"..Review posted successfully using {MODEL_NAME}..")
