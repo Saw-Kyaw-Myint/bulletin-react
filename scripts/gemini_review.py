@@ -119,16 +119,15 @@ OUTPUT FORMAT (STRICT):
 - If multiple files are present, repeat the format below per file
 - Then show ONE diff block
 - File name must be shown as bold and underline
-- Then ONE **BOLD** explanation (1–3 sentences max)
-- Enter 'existing line'  code block and 'suggestion line' code block each file
-- Bold and underline to File Name
+- Enter 'existing line'  code block and 'suggestion line' code block each file 
+- End Diff block
+- Under diff block, explanation show **BOLD**  design (1–3 sentences max)
 
 
 You MUST follow the output format exactly.
 Do NOT add extra text, headings, or explanations outside this structure.
 
-VALID OUTPUT STRUCTURE:
-
+Example VALID OUTPUT STRUCTURE:
 ```diff
 // filename.py (Note => Bold and underline to this Line)
 -L23: existing line
