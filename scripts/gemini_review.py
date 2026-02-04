@@ -38,6 +38,15 @@ def extract_changed_lines_with_numbers(patch: str) -> List[Dict]:
 
     return results
 
+def is_reviewable(file, source_dir, allowed_extensions):
+    if not file.patch:
+        return False
+
+    if source_dir and not file.filename.startswith(source_dir):
+        return False
+
+    return file.filename.endswith(allowed_extensions)
+
 
 def main():
     try:
@@ -46,6 +55,14 @@ def main():
         GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
         PR_NUMBER = os.environ.get("PR_NUMBER")
         REPO = os.environ.get("REPO")
+        AI_REVIEW_SOURCE_DIR = os.environ.get("AI_REVIEW_SOURCE_DIR", "")
+        AI_REVIEW_EXTENSIONS = tuple(
+        ext.strip()
+        for ext in os.environ.get(
+            "AI_REVIEW_EXTENSIONS",
+            ".py"
+            ).split(",")
+        )
 
         if not all([GEMINI_API_KEY, GITHUB_TOKEN, PR_NUMBER, REPO]):
             missing = [
@@ -70,11 +87,11 @@ def main():
         diffs = ""
 
         for file in pr.get_files():
-            if (
-                not file.patch
-                or not file.filename.startswith("src/")
-                or not file.filename.endswith((".js", ".ts", ".jsx", ".tsx"))
-            ):
+            if is_reviewable(
+        file,
+        AI_REVIEW_SOURCE_DIR,
+        AI_REVIEW_EXTENSIONS
+    ):
                 continue
 
             changed_lines = extract_changed_lines_with_numbers(file.patch)
