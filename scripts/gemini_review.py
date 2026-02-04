@@ -126,14 +126,17 @@ OUTPUT FORMAT (STRICT):
 You MUST follow the output format exactly.
 Do NOT add extra text, headings, or explanations outside this structure.
 VALID OUTPUT STRUCTURE:
-**filename.py**
+<a href="#"><b><i>filename.py</i></b></a>
 ```diff
 -L23: existing line
-\n
+
 + suggestion line
 
 **Short explanation of the problem and fix.**
+
 ---
+
+
 
 DO NOT add anything else.
 INVALID OUTPUT EXAMPLES (NEVER DO THESE):
