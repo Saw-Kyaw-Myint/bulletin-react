@@ -115,32 +115,26 @@ MANDATORY RULES (DO NOT VIOLATE):
 - If there are NO problems, output NOTHING (empty response)
 - Any output not matching the required format is INVALID
 
-OUTPUT FORMAT RULES (STRICT):
-- If multiple files are present, repeat the format below for EACH file
-- Each file MUST contain exactly ONE diff block
-- The filename MUST be bold AND underlined
-- The diff block MUST contain:
-  - one removed line (existing line)
-  - ONE blank line
-  - one added line (suggested fix)
-- Do NOT include line numbers unless they already exist in the diff
-- After the diff block, include a SHORT explanation (1–3 sentences)
-- The explanation MUST be **BOLD**
-- Do NOT add anything outside this structure
+OUTPUT FORMAT (STRICT):
+- If multiple files are present, repeat the format below per file
+- File name must be shown as plain text on its own line
+- Then show ONE diff block
+- Then ONE **BOLD** explanation (1–3 sentences max)
+- Enter 'existing line'  code block and 'suggestion line' code block each file
+- Bold and underline to File Name
 
-YOU MUST FOLLOW THIS OUTPUT FORMAT EXACTLY.
-DO NOT add headings, summaries, bullet points, or extra text.
 
-VALID OUTPUT STRUCTURE (Markdown):
+You MUST follow the output format exactly.
+Do NOT add extra text, headings, or explanations outside this structure.
 
-__**filename.py**__
+VALID OUTPUT STRUCTURE:
 
+filename.py (Note => Bold and italic to this Line)
 ```diff
--existing line
-
-+ suggested line
-
-**Short explanation of the problem and the fix.**
+-L23: existing line
+\n
++ suggestion line
+Short explanation of the problem and fix. (Note => Bold this Line)
 
 DO NOT add anything else.
 
