@@ -117,18 +117,19 @@ MANDATORY RULES (DO NOT VIOLATE):
 
 OUTPUT FORMAT (STRICT):
 - If multiple files are present, repeat the format below per file
-- File name must be shown as plain text on its own line
+- File name must be shown as plain bold text on its own line
 - Then show ONE diff block
-- Then ONE **BOLD** explanation (1–3 sentences max)
 - Enter 'existing line'  code block and 'suggestion line' code block each file
-- Bold and italic to File Name
+- Then ONE **BOLD** explanation (1–3 sentences max)
+- Horizontal line under explanation
+
 
 
 You MUST follow the output format exactly.
 Do NOT add extra text, headings, or explanations outside this structure.
 
 VALID OUTPUT STRUCTURE:
-
+---
 filename.py (Note => Bold and italic to this Line)
 ```diff
 -L23: existing line
