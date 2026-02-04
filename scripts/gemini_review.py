@@ -131,7 +131,7 @@ VALID OUTPUT STRUCTURE:
 -L23: existing line
 
 + suggestion line
-
+```
 **Short explanation of the problem and fix.**
 
 ---
