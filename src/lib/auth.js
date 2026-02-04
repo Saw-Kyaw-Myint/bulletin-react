@@ -20,6 +20,10 @@ export const saveTokenAndAuth = (tokeName, token, saveAuth = true) => {
   if (saveAuth && decodedAccess.user) {
     setUser(decodedAccess.user);
   }
+
+  if (saveAuth && decodedAccess.user) {
+    setUser(decodedAccess.user);
+  }
 };
 
 export const logout = (deleteSession = true) => {

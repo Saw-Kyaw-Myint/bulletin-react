@@ -4,7 +4,7 @@ export function truncateText(text, maxLength = 50) {
 
   return text.slice(0, maxLength) + "...";
 }
-
+console.log("console");
 export const confirmApi = async ({
   apiFn,
   payload,

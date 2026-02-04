@@ -70,7 +70,11 @@ def main():
         diffs = ""
 
         for file in pr.get_files():
-            if not file.filename.endswith(".py") or not file.patch:
+            if (
+                not file.patch
+                or not file.filename.startswith("src/")
+                or not file.filename.endswith((".js", ".ts", ".jsx", ".tsx"))
+            ):
                 continue
 
             changed_lines = extract_changed_lines_with_numbers(file.patch)
