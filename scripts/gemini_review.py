@@ -117,7 +117,7 @@ MANDATORY RULES (DO NOT VIOLATE):
 
 OUTPUT FORMAT (STRICT):
 - If multiple files are present, repeat the format below per file
-- File name must be shown as plain bold text on its own line
+- File name must be shown as a text with bold font on its own line
 - Then show ONE diff block
 - Enter 'existing line'  code block and 'suggestion line' code block each file
 - Then ONE **bold** explanation (1–3 sentences max)
