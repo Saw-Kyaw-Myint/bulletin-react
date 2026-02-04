@@ -18,15 +18,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Install dependencies
-        run: |
-          poetry add PyGithub requests
-          poetry install --no-root
+      - name: Install deps
+        run: pip install requests PyGithub
 
       - name: Run Gemini PR Review
         env:
