@@ -27,6 +27,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
-          AI_REVIEW_SOURCE_DIR: src/
-          AI_REVIEW_EXTENSIONS: .js,.jsx,.ts,.tsx
+          # AI_REVIEW_SOURCE_DIR: src/
+          AI_REVIEW_EXTENSIONS: .py
         run: python scripts/gemini_review.py
