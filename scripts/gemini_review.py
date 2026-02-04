@@ -121,7 +121,7 @@ OUTPUT FORMAT (STRICT):
 - Then show ONE diff block
 - Then ONE **BOLD** explanation (1–3 sentences max)
 - Enter 'existing line'  code block and 'suggestion line' code block each file
-- Bold and underline to File Name
+- Bold and italic to File Name
 
 
 You MUST follow the output format exactly.
