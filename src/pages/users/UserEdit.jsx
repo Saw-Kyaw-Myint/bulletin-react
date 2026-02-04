@@ -146,6 +146,7 @@ const UserEdit = () => {
             payload: form,
             queryClient,
             invalidateKeys: [["users"]],
+            onSuccess: () => handleReset(),
           });
         }
       },
