@@ -120,35 +120,27 @@ OUTPUT FORMAT (STRICT):
 - File name must be shown as plain bold text on its own line
 - Then show ONE diff block
 - Enter 'existing line'  code block and 'suggestion line' code block each file
-- Then ONE **BOLD** explanation (1–3 sentences max)
-- Horizontal line under explanation
-
-
+- Then ONE **bold** explanation (1–3 sentences max)
+- Horizontal line (---) under explanation
 
 You MUST follow the output format exactly.
 Do NOT add extra text, headings, or explanations outside this structure.
-
 VALID OUTPUT STRUCTURE:
----
-filename.py (Note => Bold and italic to this Line)
+**filename.py**
 ```diff
 -L23: existing line
 \n
 + suggestion line
-Short explanation of the problem and fix. (Note => Bold this Line)
+
+**Short explanation of the problem and fix.**
+---
 
 DO NOT add anything else.
-
 INVALID OUTPUT EXAMPLES (NEVER DO THESE):
-
 "This is good practice"
-
 "The code looks fine"
-
 Explanations without a diff
-
 Diff blocks containing --- , +++ , @@
-
 Paragraphs or summaries
 
 CODE CHANGES TO REVIEW:
