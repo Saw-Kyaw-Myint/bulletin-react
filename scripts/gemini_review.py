@@ -117,9 +117,9 @@ MANDATORY RULES (DO NOT VIOLATE):
 
 OUTPUT FORMAT (STRICT):
 - If multiple files are present, repeat the format below per file
-- File name must be shown as a text with bold font on its own line
+- File name must be shown as <a href="#"><b>filename.py</b></a> text with bold font on its own line
 - Then show ONE diff block
-- Enter 'existing line'  code block and 'suggestion line' code block each file
+- Enter line between 'existing line'  code block and 'suggestion line' code block in each file
 - Then ONE **bold** explanation (1–3 sentences max)
 - Horizontal line (---) under explanation
 
