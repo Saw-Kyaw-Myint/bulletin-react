@@ -119,7 +119,7 @@ OUTPUT FORMAT (STRICT):
 - If multiple files are present, repeat the format below per file
 - File name must be shown as <a href="#"><b>filename.py</b></a> text with bold font on its own line
 - Then show ONE diff block
-- Enter line between 'existing line'  code block and 'suggestion line' code block in each file
+- Divide space line between 'existing line' and 'suggestion line'
 - Then ONE **bold** explanation (1–3 sentences max)
 - Horizontal line (---) under explanation
 
