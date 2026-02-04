@@ -2,6 +2,7 @@ export const Role = {
   1: "User",
   0: "Admin",
 };
+console.log("log log");
 
 export const RoleText = {
   User: 1,
