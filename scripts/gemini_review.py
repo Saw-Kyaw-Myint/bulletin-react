@@ -87,7 +87,7 @@ def main():
         diffs = ""
 
         for file in pr.get_files():
-            if is_reviewable(
+            if not is_reviewable(
         file,
         AI_REVIEW_SOURCE_DIR,
         AI_REVIEW_EXTENSIONS
